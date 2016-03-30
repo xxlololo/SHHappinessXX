@@ -7,6 +7,7 @@
 //
 
 #import "SHSweetTimeViewController.h"
+#import "UIImage+SHRoundedRectImage.h"
 @interface SHSweetTimeViewController ()
 @property (nonatomic,strong)NSArray *data;
 @property (nonatomic,strong)UIView *headerView;
@@ -29,10 +30,13 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
     
 }
-
+- (void)viewDidAppear:(BOOL)animated{
+    
+    self.tabBarController.tabBar.hidden = NO ;
+}
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     
     return self.data.count;
@@ -51,11 +55,15 @@
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:ID];
     }
     NSDictionary *dict = self.data[indexPath.section][indexPath.row];
-    NSLog(@"%@",dict);
-    //  cell.imageView.image = dict[@"icon"];
+    //设置图形为圆角
+    UIImage *image = [UIImage imageNamed:dict[@"icon"]];
+    CGSize size = CGSizeMake(40, 40);
+    cell.imageView.image = [UIImage createRoundedRectImage:image size:size radius:10];
+    
+    //    cell.imageView.image = [UIImage imageNamed:dict[@"icon"]];
     cell.textLabel.text = dict[@"title"];
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-    //cell.accessoryView =self.beginBtn;
+    
     
     return cell;
 }
@@ -65,15 +73,17 @@
     NSString *classStr = dict[@"vcClass"];
     Class c = NSClassFromString(classStr);
     UIViewController *vc = [[c alloc]init];
-    //[self.navigationController pushViewController:vc animated:YES];
-    UINavigationController *nvc = [[UINavigationController alloc]initWithRootViewController:vc];
-    nvc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-    [self presentViewController:nvc animated:YES completion:^{
-        
-    }];
+    
+    [self.navigationController pushViewController:vc animated:YES ];
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    return 50;
+    return 60;
 }
-
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
+    
+    return 30.0;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section{
+    return 0.001;
+}
 @end

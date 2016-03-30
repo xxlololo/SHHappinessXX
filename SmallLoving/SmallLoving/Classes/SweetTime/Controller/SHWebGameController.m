@@ -22,7 +22,12 @@
     self.navigationController.navigationBar.barTintColor = [UIColor redColor];
     [self layoutViews];
     
-    }
+}
+- (void)viewDidAppear:(BOOL)animated{
+    
+    self.tabBarController.tabBar.hidden = YES ;
+}
+
 - (void)layoutViews{
     self.webView = [[UIWebView alloc]initWithFrame:CGRectMake(-100, 0, self.view.frame.size.width+200, self.view.frame.size.height)];
     self.url = self.urlStr ;
@@ -38,9 +43,7 @@
 }
 - (void)leftButtonAction{
     
-    [self dismissViewControllerAnimated:YES completion:^{
-        
-    }];
+    [self.navigationController popViewControllerAnimated:YES];
     
 }
 @end

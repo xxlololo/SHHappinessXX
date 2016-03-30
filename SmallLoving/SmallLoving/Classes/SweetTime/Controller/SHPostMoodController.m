@@ -12,10 +12,12 @@
 #import "THEditPhotoView.h"
 #import "SHSweetSpaceController.h"
 #import "SHPostMood.h"
+#import "SHFMDB.h"
+#import "SHSweetSpaceItem.h"
 @interface SHPostMoodController ()<UINavigationControllerDelegate,UIImagePickerControllerDelegate,THEditPhotoViewDelegate>
 @property (nonatomic,weak)THEditPhotoView *editPhotoView;
 @property (nonatomic,strong)SHPostMood *postMood;
-
+@property (nonatomic,strong)SHSweetSpaceItem *spaceItem;
 #import "SHPostMoodController.h"
 
 @end
@@ -33,6 +35,8 @@
     self.navigationItem.title = @"书写心情";
     [self layoutView];
     [self layoutViews];
+    
+    
 }
 
 - (NSMutableArray *)array{
@@ -91,14 +95,24 @@
     }else{
         SHSweetSpaceController *sweetSpace = [[SHSweetSpaceController alloc]init];
         sweetSpace.pictureArr = self.array;
-        NSLog(@"%@-------------%@",sweetSpace.pictureArr,self.array);
         //block传值
         self.callValue(self.postMood.titleField.text,self.postMood.textView.text,self.array);
-        
-        [self.navigationController popViewControllerAnimated:YES];
+        NSString *icon = @"food";
+        NSString *name = @"我们只想找到一份好工作";
+        NSString *vip = @"1";
+        [[SHFMDB sharedSHFMDB]insertSpaceItem:self.spaceItem titleText:self.postMood.titleField.text icon:[NSString stringWithFormat:@"%@",icon] name:[NSString stringWithFormat:@"%@",name] contentText:self.postMood.textView.text];
+        self.spaceItem.titleText = self.titleField.text;
+        self.spaceItem.text = self.textView.text ;
+        self.spaceItem.icon = icon ;
+        self.spaceItem.name = name;
+        self.spaceItem.vip = vip;
+        [sweetSpace.tableView reloadData];
         
     }
+    [self.navigationController popViewControllerAnimated:YES];
+    
 }
+
 - (void)cancleBtnClick{
     
     [self.navigationController popViewControllerAnimated:YES];

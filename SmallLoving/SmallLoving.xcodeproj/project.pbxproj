@@ -92,8 +92,6 @@
 		04EF90FB1CA4D4C200DCE9E2 /* space.plist in Resources */ = {isa = PBXBuildFile; fileRef = 04EF90D61CA4D4C200DCE9E2 /* space.plist */; };
 		04EF90FC1CA4D4C200DCE9E2 /* sweetGame.plist in Resources */ = {isa = PBXBuildFile; fileRef = 04EF90D71CA4D4C200DCE9E2 /* sweetGame.plist */; };
 		04EF90FD1CA4D4C200DCE9E2 /* sweetTime.plist in Resources */ = {isa = PBXBuildFile; fileRef = 04EF90D81CA4D4C200DCE9E2 /* sweetTime.plist */; };
-		04EF90FE1CA4D4C200DCE9E2 /* sweetGame.plist in Resources */ = {isa = PBXBuildFile; fileRef = 04EF90D91CA4D4C200DCE9E2 /* sweetGame.plist */; };
-		04EF90FF1CA4D4C200DCE9E2 /* sweetTime.plist in Resources */ = {isa = PBXBuildFile; fileRef = 04EF90DA1CA4D4C200DCE9E2 /* sweetTime.plist */; };
 		04EF91001CA4D4C200DCE9E2 /* SHSpaceCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 04EF90DD1CA4D4C200DCE9E2 /* SHSpaceCell.m */; };
 		04EF910E1CA4E5A300DCE9E2 /* CYTabBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 04EF910B1CA4E5A300DCE9E2 /* CYTabBar.m */; };
 		04EF910F1CA4E5A300DCE9E2 /* CYTabBarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 04EF910D1CA4E5A300DCE9E2 /* CYTabBarButton.m */; };
@@ -107,6 +105,10 @@
 		04FD144B1CA2536600CDB91E /* CYLoginView.m in Sources */ = {isa = PBXBuildFile; fileRef = 04FD144A1CA2536600CDB91E /* CYLoginView.m */; };
 		04FD144E1CA2537000CDB91E /* CYLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 04FD144D1CA2537000CDB91E /* CYLoginViewController.m */; };
 		5EF2222325FF10ED72D0B0C8 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CCC9C4650623CBE5F094538 /* libPods.a */; };
+		C21FA2A51CABD01A0014FA18 /* SHFMDB.m in Sources */ = {isa = PBXBuildFile; fileRef = C21FA2A41CABD01A0014FA18 /* SHFMDB.m */; };
+		C21FA2A91CABD18B0014FA18 /* game.png in Resources */ = {isa = PBXBuildFile; fileRef = C21FA2A61CABD18B0014FA18 /* game.png */; };
+		C21FA2AA1CABD18B0014FA18 /* image1.png in Resources */ = {isa = PBXBuildFile; fileRef = C21FA2A71CABD18B0014FA18 /* image1.png */; };
+		C21FA2AB1CABD18B0014FA18 /* space.png in Resources */ = {isa = PBXBuildFile; fileRef = C21FA2A81CABD18B0014FA18 /* space.png */; };
 		C246546A1CA55D4C00C0792A /* menses-in.gif in Resources */ = {isa = PBXBuildFile; fileRef = C24654691CA55D4C00C0792A /* menses-in.gif */; };
 		C26583CD1CA66FB200B76914 /* SHPhotoCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C26583CC1CA66FB200B76914 /* SHPhotoCollectionViewCell.m */; };
 		C2F0B4F21CA4ECFF00E1FDBA /* SHPostMood.m in Sources */ = {isa = PBXBuildFile; fileRef = C2F0B4ED1CA4ECFF00E1FDBA /* SHPostMood.m */; };
@@ -285,8 +287,6 @@
 		04EF90D61CA4D4C200DCE9E2 /* space.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = space.plist; sourceTree = "<group>"; };
 		04EF90D71CA4D4C200DCE9E2 /* sweetGame.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = sweetGame.plist; sourceTree = "<group>"; };
 		04EF90D81CA4D4C200DCE9E2 /* sweetTime.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = sweetTime.plist; sourceTree = "<group>"; };
-		04EF90D91CA4D4C200DCE9E2 /* sweetGame.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = sweetGame.plist; sourceTree = "<group>"; };
-		04EF90DA1CA4D4C200DCE9E2 /* sweetTime.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = sweetTime.plist; sourceTree = "<group>"; };
 		04EF90DC1CA4D4C200DCE9E2 /* SHSpaceCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHSpaceCell.h; sourceTree = "<group>"; };
 		04EF90DD1CA4D4C200DCE9E2 /* SHSpaceCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SHSpaceCell.m; sourceTree = "<group>"; };
 		04EF910A1CA4E5A300DCE9E2 /* CYTabBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYTabBar.h; sourceTree = "<group>"; };
@@ -314,6 +314,11 @@
 		5CCC9C4650623CBE5F094538 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		67003CC35080F3DC1F4D4F7F /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		A5B5789F5B08A2ED94ED2258 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
+		C21FA2A31CABD01A0014FA18 /* SHFMDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHFMDB.h; sourceTree = "<group>"; };
+		C21FA2A41CABD01A0014FA18 /* SHFMDB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SHFMDB.m; sourceTree = "<group>"; };
+		C21FA2A61CABD18B0014FA18 /* game.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = game.png; sourceTree = "<group>"; };
+		C21FA2A71CABD18B0014FA18 /* image1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = image1.png; sourceTree = "<group>"; };
+		C21FA2A81CABD18B0014FA18 /* space.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = space.png; sourceTree = "<group>"; };
 		C24654691CA55D4C00C0792A /* menses-in.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "menses-in.gif"; sourceTree = "<group>"; };
 		C26583CB1CA66FB200B76914 /* SHPhotoCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHPhotoCollectionViewCell.h; sourceTree = "<group>"; };
 		C26583CC1CA66FB200B76914 /* SHPhotoCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SHPhotoCollectionViewCell.m; sourceTree = "<group>"; };
@@ -891,8 +896,6 @@
 				04EF90BA1CA4D4C200DCE9E2 /* icon */,
 				04EF90CD1CA4D4C200DCE9E2 /* Model */,
 				04EF90D51CA4D4C200DCE9E2 /* plistFile */,
-				04EF90D91CA4D4C200DCE9E2 /* sweetGame.plist */,
-				04EF90DA1CA4D4C200DCE9E2 /* sweetTime.plist */,
 				04EF90DB1CA4D4C200DCE9E2 /* View */,
 			);
 			path = SweetTime;
@@ -929,6 +932,9 @@
 		04EF90BA1CA4D4C200DCE9E2 /* icon */ = {
 			isa = PBXGroup;
 			children = (
+				C21FA2A61CABD18B0014FA18 /* game.png */,
+				C21FA2A71CABD18B0014FA18 /* image1.png */,
+				C21FA2A81CABD18B0014FA18 /* space.png */,
 				04EF90BB1CA4D4C200DCE9E2 /* 2048.png */,
 				04EF90BC1CA4D4C200DCE9E2 /* alltime.png */,
 				04EF90BD1CA4D4C200DCE9E2 /* back.png */,
@@ -954,6 +960,8 @@
 		04EF90CD1CA4D4C200DCE9E2 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				C21FA2A31CABD01A0014FA18 /* SHFMDB.h */,
+				C21FA2A41CABD01A0014FA18 /* SHFMDB.m */,
 				04EF90CE1CA4D4C200DCE9E2 /* SHCellFrameItem.h */,
 				04EF90CF1CA4D4C200DCE9E2 /* SHCellFrameItem.m */,
 				04EF90D01CA4D4C200DCE9E2 /* SHSweetGameCell.h */,
@@ -1136,11 +1144,10 @@
 				04EF90EF1CA4D4C200DCE9E2 /* lover.png in Resources */,
 				04EF90F31CA4D4C200DCE9E2 /* start1.png in Resources */,
 				04EF90EC1CA4D4C200DCE9E2 /* heart.png in Resources */,
-				04EF90FF1CA4D4C200DCE9E2 /* sweetTime.plist in Resources */,
 				04EF90F11CA4D4C200DCE9E2 /* show_affection.png in Resources */,
+				C21FA2A91CABD18B0014FA18 /* game.png in Resources */,
 				04EF90E51CA4D4C200DCE9E2 /* 2048.png in Resources */,
 				04EF90FB1CA4D4C200DCE9E2 /* space.plist in Resources */,
-				04EF90FE1CA4D4C200DCE9E2 /* sweetGame.plist in Resources */,
 				04EF90EA1CA4D4C200DCE9E2 /* food.png in Resources */,
 				04EF90E71CA4D4C200DCE9E2 /* back.png in Resources */,
 				04EF90ED1CA4D4C200DCE9E2 /* hero.png in Resources */,
@@ -1149,7 +1156,9 @@
 				04EF90F61CA4D4C200DCE9E2 /* 雪花.png in Resources */,
 				04EF90F41CA4D4C200DCE9E2 /* triller-3-256.png in Resources */,
 				04EF90FD1CA4D4C200DCE9E2 /* sweetTime.plist in Resources */,
+				C21FA2AB1CABD18B0014FA18 /* space.png in Resources */,
 				04EF90E81CA4D4C200DCE9E2 /* bier.png in Resources */,
+				C21FA2AA1CABD18B0014FA18 /* image1.png in Resources */,
 				04EF90E91CA4D4C200DCE9E2 /* cutfruit.png in Resources */,
 				C246546A1CA55D4C00C0792A /* menses-in.gif in Resources */,
 				0411243D1C9D3FD7001B7DD2 /* Assets.xcassets in Resources */,
@@ -1276,6 +1285,7 @@
 				04F36D2C1C9D649B00F997D6 /* CYAccountViewController.m in Sources */,
 				04FD14361CA22E0800CDB91E /* CYAlertController.m in Sources */,
 				04EF90FA1CA4D4C200DCE9E2 /* SHSweetSpaceItem.m in Sources */,
+				C21FA2A51CABD01A0014FA18 /* SHFMDB.m in Sources */,
 				04EF90911CA4CBC100DCE9E2 /* SHMyViewController.m in Sources */,
 				04EF90701CA4CBB700DCE9E2 /* SHHomeViewController.m in Sources */,
 				04EF907F1CA4CBB700DCE9E2 /* SHLeftBackButton.m in Sources */,

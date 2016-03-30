@@ -24,4 +24,5 @@
 
 - (instancetype)initWithDict:(NSDictionary *)dict;
 + (instancetype)spaceWithDic:(NSDictionary *)dict;
+- (instancetype)spaceWithTitel:(NSString *)titleText icon:(NSString *)icon name:(NSString *)name text:(NSString *)text;
 @end

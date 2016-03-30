@@ -9,13 +9,13 @@
 			<key>title</key>
 			<string>情侣说</string>
 			<key>icon</key>
-			<string></string>
+			<string>space</string>
 		</dict>
 	</array>
 	<array>
 		<dict>
 			<key>icon</key>
-			<string></string>
+			<string>game</string>
 			<key>title</key>
 			<string>情侣游戏</string>
 			<key>vcClass</key>

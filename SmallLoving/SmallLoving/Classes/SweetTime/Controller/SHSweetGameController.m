@@ -34,22 +34,24 @@
     [super viewDidLoad];
     self.navigationItem.title = @"情侣游戏";
     [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav-bar-bg"] forBarMetrics:UIBarMetricsDefault];
-//    [self.tableView registerClass:[SHSweetGameCell class] forCellReuseIdentifier:@"aaaaaa"];
+    //    [self.tableView registerClass:[SHSweetGameCell class] forCellReuseIdentifier:@"aaaaaa"];
     UIBarButtonItem *leftItem = [[UIBarButtonItem alloc]initWithTitle:@"返回" style:UIBarButtonItemStylePlain target:self action:@selector(leftItemAction)];
     self.navigationItem.leftBarButtonItem = leftItem ;
     [self.tableView registerNib:[UINib nibWithNibName:@"SHSweetGameCell" bundle:nil] forCellReuseIdentifier:@"aaaaaa"];
     [self.tableView reloadData];
-  
-    }
+    
+}
 - (void)leftItemAction{
-    [self dismissViewControllerAnimated:YES completion:^{
-        
-    }];
+    [self.navigationController popViewControllerAnimated:YES];
+}
+- (void)viewWillAppear:(BOOL)animated{
+    
+    self.tabBarController.tabBar.hidden = YES ;
 }
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-
+    
     return self.dataArr.count;
 }
 
@@ -78,16 +80,11 @@
 {
     
     NSLog(@"MyRow:%ld",[self.tableView indexPathForCell:((SHSweetGameCell *)[[btn superview]superview])].row);
-   SHWebGameController *webGame = [[SHWebGameController alloc]init];
-   self.dic = self.dataArr[[self.tableView indexPathForCell:((SHSweetGameCell *)[[btn   superview]superview])].section][[self.tableView indexPathForCell:((SHSweetGameCell *)[[btn   superview]superview])].row];
+    SHWebGameController *webGame = [[SHWebGameController alloc]init];
+    self.dic = self.dataArr[[self.tableView indexPathForCell:((SHSweetGameCell *)[[btn   superview]superview])].section][[self.tableView indexPathForCell:((SHSweetGameCell *)[[btn   superview]superview])].row];
     webGame.urlStr = self.dic[@"url"];
     webGame.titleName = self.dic[@"title"];
-    UINavigationController *nc = [[UINavigationController alloc]initWithRootViewController:webGame];
-    nc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-    [self presentViewController:nc animated:YES completion:^{
-      
-        
-    }];
+    [self.navigationController pushViewController:webGame animated:YES];
     
     
 }
@@ -102,7 +99,5 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
     return 30;
 }
-- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section{
-    return 0;
-}
+
 @end

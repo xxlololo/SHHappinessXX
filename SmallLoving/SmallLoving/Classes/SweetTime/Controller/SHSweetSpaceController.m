@@ -14,17 +14,21 @@
 #import "SHPostMoodController.h"
 #import "SHImageFrame.h"
 #import "SHSingleArray.h"
-@interface SHSweetSpaceController ()
-//@property (nonatomic,strong)NSArray *space;
+#import "SHFMDB.h"
+#define kScreenWith [UIScreen mainScreen].bounds.size.width
+#define kScreenHeight [UIScreen mainScreen].bounds.size.height
+@interface SHSweetSpaceController ()<UITableViewDelegate, UITableViewDataSource>
+
 /**
  
  *  存放所有cell的frame
  */
-@property (nonatomic,strong)NSArray *frameArr;
+@property (nonatomic,strong)NSMutableArray *frameArr;
 @property (strong, nonatomic) CADisplayLink *displayLink;
 @property (nonatomic,strong)THEditPhotoView *editPhotoView;
 @property (nonatomic,strong)SHImageFrame *imageFrame ;
 @property (nonatomic,strong)SHSingleArray *singleArray;
+@property (nonatomic,strong)SHSweetSpaceItem *spaceItem;
 @end
 
 @implementation SHSweetSpaceController
@@ -34,23 +38,102 @@
     }
     return _pictureArr ;
 }
+- (NSMutableArray *)frameArr{
+    if (!_frameArr) {
+        _frameArr = [NSMutableArray array];
+    }
+    return _frameArr ;
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self layoutViews];
     self.singleArray = [SHSingleArray shareSHSingArray];
+    [[SHFMDB sharedSHFMDB]openFMDB];
+    UIView *llview = [[UIView alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 260)];
+    //背景图片
+    self.headerImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, kScreenWith, 260)];
+    self.headerImageView.image = [UIImage imageNamed:@"image1.png"];
+    
+    //去掉背景图片
+    //    [self.navigationController.navigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
+    //去掉底部线条
+    //    [self.navigationController.navigationBar setShadowImage:[[UIImage alloc] init]];
+    UIView *contentView = [[UIView alloc]initWithFrame:self.headerImageView.bounds];
+    self.headerImageView.center = contentView.center ;
+    contentView.layer.masksToBounds = YES ;
+    self.headerContentView = contentView;
+    //添加背景view
+    //    CGRect backView_frame = CGRectMake(0, -20, kScreenWith, 64);
+    //    UIView *backView = [[UIView alloc] initWithFrame:backView_frame];
+    //    UIColor *backColor = [UIColor colorWithRed:0.2 green:0.6 blue:0.4 alpha:0];
+    //    backView.backgroundColor = [backColor colorWithAlphaComponent:0.3];
+    //    [self.navigationController.navigationBar addSubview:backView];
+    //    self.backView = backView;
+    //    self.backColor = backColor;
+    
+    //信息内容
+    CGRect icon_frame = CGRectMake(12, self.headerContentView.bounds.size.height-80-12, 80, 80);
+    UIImageView *icon = [[UIImageView alloc] initWithFrame:icon_frame];
+    icon.backgroundColor = [UIColor clearColor];
+    icon.image = [UIImage imageNamed:@"game.png"];
+    icon.layer.cornerRadius = 80/2.0f;
+    icon.layer.masksToBounds = YES;
+    icon.layer.borderWidth = 1.0f;
+    icon.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    [self.headerContentView addSubview:self.headerImageView];
+    [self.headerContentView addSubview:icon];
+    self.icon = icon;
+    
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(108, self.headerContentView.bounds.size.height-60-12, kScreenWith-108-12, 50)];
+    label.text = @"真羡慕你们这些人, 年纪轻轻的就认识了才华横溢的我!";
+    label.textColor = [UIColor whiteColor];
+    label.font = [UIFont systemFontOfSize:15];
+    label.numberOfLines = 0;
+    self.label = label;
+    [self.headerContentView addSubview:self.label];
+    [llview addSubview:self.headerContentView];
+    self.tableView.tableHeaderView = llview;
+    self.automaticallyAdjustsScrollViewInsets = NO ;
+    self.navigationController.navigationBar.translucent = NO;
     //雪花效果
     //    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(handleAction:)];
     //
     //    [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
-    [self.tableView reloadData];
+    
 }
+
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    CGFloat offset_Y = scrollView.contentOffset.y;
+    CGFloat alpha = (offset_Y + 40)/300.0f;
+    self.backView.backgroundColor = [self.backColor colorWithAlphaComponent:alpha];
+    
+    if (offset_Y <-64) {
+        //放大比例
+        CGFloat add_topHeight = -(offset_Y+64);
+        self.scale = (260+add_topHeight)/260;
+        //改变 frame
+        CGRect contentView_frame = CGRectMake(0, -add_topHeight, kScreenWith, 260+add_topHeight);
+        self.headerContentView.frame = contentView_frame;
+        CGRect imageView_frame = CGRectMake(-(kScreenWith*self.scale-kScreenWith)/2.0f,
+                                            0,
+                                            kScreenWith*self.scale,
+                                            260+add_topHeight);
+        self.headerImageView.frame = imageView_frame;
+        
+        CGRect icon_frame = CGRectMake(12, self.headerContentView.bounds.size.height-80-12, 80, 80);
+        self.icon.frame = icon_frame;
+        
+        self.label.frame = CGRectMake(108, self.headerContentView.bounds.size.height-60-12, kScreenWith-108-12, 50);
+        
+    }
+    
+}
+
 - (void)layoutViews{
     
     self.navigationItem.title = @"情侣空间";
     self.tabBarController.tabBar.hidden = YES ;
-    UIImageView *imageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"lover.png"]];
-    [self.tableView setBackgroundView:imageView];
-    self.tableView.backgroundColor = [UIColor clearColor];
+    self.tableView.backgroundColor = [UIColor whiteColor];
     [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav-bar-bg"] forBarMetrics:UIBarMetricsDefault];
     [self.tableView reloadData];
     UIBarButtonItem *rightItem = [[UIBarButtonItem alloc]initWithTitle:@"发布心情" style:UIBarButtonItemStylePlain target:self action:@selector(rightItemAction)];
@@ -61,72 +144,60 @@
 }
 
 - (void)viewDidAppear:(BOOL)animated{
-    
+    [super viewDidAppear:animated];
     self.tabBarController.tabBar.hidden = YES ;
     self.imageFrame.arr = self.pictureArr;
-    NSLog(@"*********%@",self.singleArray.singleArr);
-    [self frameArr];
     [self.tableView reloadData];
+    
 }
 - (void)rightItemAction{
     //获取数据
     SHPostMoodController *postMood = [[SHPostMoodController alloc]init];
-    __weak typeof(self) weakSelf = self ;
+    
+    __weak typeof(self) weakSelf = self;
     //给block属性 赋值
     postMood.callValue = ^(NSString *titleCopy, NSString *textCopy,NSMutableArray *array){
         weakSelf.titleCopy =titleCopy;
         weakSelf.textCopy = textCopy;
         weakSelf.pictureArr = array ;
         self.singleArray.singleArr = array;
-        
+        //创建SHCellframe模型
+        SHCellFrameItem *cellFrame = [[SHCellFrameItem alloc]init];
+        cellFrame.spaceItem = self.spaceItem;
+        [self.frameArr addObject:cellFrame];
+        //3.2添加模型对象到数组
     };
     [self.navigationController pushViewController:postMood animated:YES];
     
 }
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    //初始化
+    NSArray *array =[[SHFMDB sharedSHFMDB]selectAllSpaceItem];
+    NSLog(@"第一次获取数据%@",array);
+    //3.将dictArray 里面的所有字典转换成模型,加到新的数组中
+    NSMutableArray *arr = [NSMutableArray array];
+    for (SHSweetSpaceItem *spaceItem in array) {
+        //3.1创建模型对象
+        //创建SHCellframe模型
+        SHCellFrameItem *cellFrame = [[SHCellFrameItem alloc]init];
+        cellFrame.spaceItem = spaceItem;
+        //3.2添加模型对象到数组
+        [arr addObject:cellFrame];
+    }
+    //4.赋值
+    self.frameArr = [NSMutableArray arrayWithArray:arr];
+    [self.tableView reloadData];
+}
 - (void)leftItemAction{
+    
     [self.navigationController popViewControllerAnimated:YES];
 }
 - (id)init{
     if (self = [super initWithStyle:UITableViewStyleGrouped]) {
         
-        
     }
     return self;
-    
-}
-//获取数据
-- (NSArray *)frameArr{
-    NSLog(@"%@----%@",self.titleCopy,self.textCopy);
-    NSLog(@"self.pictureArr--->%@",self.pictureArr);
-    
-    if (_frameArr == nil) {
-        //初始化
-        //1.获得plist的全路径
-        NSString *path = [[NSBundle mainBundle]pathForResource:@"space.plist" ofType:nil];
-        //2.加载数组
-        NSMutableArray *dictArray = [NSMutableArray arrayWithContentsOfFile:path];
-        NSArray *arrayKey = @[@"titleText",@"text",@"icon",@"name",@"vip",@"picture"];
-        NSArray *arrayValue = @[@"猩猿崛起2",@"猩球崛起是一部很值得看的大片,建议大家有时间的话都去看看,好电影值得欣赏!",@"bier",@"我是流氓我怕谁",@"0",self.pictureArr];
-        
-        NSDictionary *dic = [NSDictionary dictionaryWithObjects:arrayValue forKeys:arrayKey];
-        [dictArray addObject:dic];
-        //3.将dictArray 里面的所有字典转换成模型,加到新的数组中
-        NSMutableArray *arr = [NSMutableArray array ];
-        for (NSDictionary *dict in dictArray) {
-            //3.1创建模型对象
-            NSLog(@"%@",dict);
-            SHSweetSpaceItem *spaceItem = [SHSweetSpaceItem spaceWithDic:dict];
-            //创建SHCellframe模型
-            SHCellFrameItem *cellFrame = [[SHCellFrameItem alloc]init];
-            cellFrame.spaceItem = spaceItem;
-            //3.2添加模型对象到数组
-            [arr addObject:cellFrame];
-        }
-        //4.赋值
-        _frameArr = arr;
-    }
-    return _frameArr;
-    
     
 }
 #pragma mark - Table view data source
@@ -143,7 +214,8 @@
     //2.在这个方法中算出cell的高度
     //必须的
     cell.backgroundColor = [UIColor colorWithRed:(255)
-                                           green:(255)  blue:(255) alpha:.7];
+                                           green:(255)  blue:(255) alpha:.4];
+    
     cell.cellItem  = self.frameArr[indexPath.row];
     cell.selected = NO;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -154,11 +226,10 @@
     //计算高度
     //取出这行对应的frame模型
     SHCellFrameItem *cellFrame = self.frameArr[indexPath.row];
-    
     return cellFrame.cellHeight;
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
-    return 200;
+    return 0.01;
 }
 /**
  *  获取雪花特效
@@ -196,8 +267,5 @@
  
  }
  
- *  @param touches <#touches description#>
- *  @param event   <#event description#>
  */
-
 @end
