@@ -25,5 +25,6 @@
 
 #pragma  mark ---------删除数据
 - (void)delete;
+- (void)deleteWithTitle:(NSString *)titleStr context:(NSString *)contextStr;
 
 @end

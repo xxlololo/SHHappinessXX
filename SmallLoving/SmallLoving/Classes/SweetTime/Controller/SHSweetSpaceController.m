@@ -49,9 +49,9 @@
     [self layoutViews];
     self.singleArray = [SHSingleArray shareSHSingArray];
     [[SHFMDB sharedSHFMDB]openFMDB];
-    UIView *llview = [[UIView alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 260)];
+    UIView *llview = [[UIView alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 220)];
     //背景图片
-    self.headerImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, kScreenWith, 260)];
+    self.headerImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, kScreenWith, 220)];
     self.headerImageView.image = [UIImage imageNamed:@"image1.png"];
     
     //去掉背景图片
@@ -72,25 +72,26 @@
     //    self.backColor = backColor;
     
     //信息内容
-    CGRect icon_frame = CGRectMake(12, self.headerContentView.bounds.size.height-80-12, 80, 80);
+    CGRect icon_frame = CGRectMake([UIScreen mainScreen].bounds.size.width-72, self.headerContentView.bounds.size.height-30, 60, 60);
+
     UIImageView *icon = [[UIImageView alloc] initWithFrame:icon_frame];
     icon.backgroundColor = [UIColor clearColor];
     icon.image = [UIImage imageNamed:@"game.png"];
-    icon.layer.cornerRadius = 80/2.0f;
+   // icon.layer.cornerRadius = 80/2.0f;
     icon.layer.masksToBounds = YES;
     icon.layer.borderWidth = 1.0f;
     icon.layer.borderColor = [UIColor lightGrayColor].CGColor;
     [self.headerContentView addSubview:self.headerImageView];
-    [self.headerContentView addSubview:icon];
+   // [self.headerContentView addSubview:icon];
     self.icon = icon;
     
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(108, self.headerContentView.bounds.size.height-60-12, kScreenWith-108-12, 50)];
-    label.text = @"真羡慕你们这些人, 年纪轻轻的就认识了才华横溢的我!";
-    label.textColor = [UIColor whiteColor];
-    label.font = [UIFont systemFontOfSize:15];
-    label.numberOfLines = 0;
-    self.label = label;
-    [self.headerContentView addSubview:self.label];
+//    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(108, self.headerContentView.bounds.size.height-60-12, kScreenWith-108-12, 50)];
+//    label.text = @"真羡慕你们这些人, 年纪轻轻的就认识了才华横溢的我!";
+//    label.textColor = [UIColor whiteColor];
+//    label.font = [UIFont systemFontOfSize:15];
+//    label.numberOfLines = 0;
+//    self.label = label;
+//    [self.headerContentView addSubview:self.label];
     [llview addSubview:self.headerContentView];
     self.tableView.tableHeaderView = llview;
     self.automaticallyAdjustsScrollViewInsets = NO ;
@@ -107,23 +108,22 @@
     CGFloat alpha = (offset_Y + 40)/300.0f;
     self.backView.backgroundColor = [self.backColor colorWithAlphaComponent:alpha];
     
-    if (offset_Y <-64) {
+    if (offset_Y <0) {
         //放大比例
-        CGFloat add_topHeight = -(offset_Y+64);
-        self.scale = (260+add_topHeight)/260;
+        CGFloat add_topHeight = -offset_Y;
+        self.scale = (220+add_topHeight)/220;
         //改变 frame
-        CGRect contentView_frame = CGRectMake(0, -add_topHeight, kScreenWith, 260+add_topHeight);
+        CGRect contentView_frame = CGRectMake(0, -add_topHeight, kScreenWith, 220+add_topHeight);
         self.headerContentView.frame = contentView_frame;
-        CGRect imageView_frame = CGRectMake(-(kScreenWith*self.scale-kScreenWith)/2.0f,
+        CGRect imageView_frame = CGRectMake(0,
                                             0,
-                                            kScreenWith*self.scale,
-                                            260+add_topHeight);
+                                            kScreenWith,
+                                            220+add_topHeight);
         self.headerImageView.frame = imageView_frame;
         
-        CGRect icon_frame = CGRectMake(12, self.headerContentView.bounds.size.height-80-12, 80, 80);
+        CGRect icon_frame = CGRectMake(12, self.headerContentView.bounds.size.height-30, 60, 60);
         self.icon.frame = icon_frame;
         
-        self.label.frame = CGRectMake(108, self.headerContentView.bounds.size.height-60-12, kScreenWith-108-12, 50);
         
     }
     
@@ -150,6 +150,27 @@
     [self.tableView reloadData];
     
 }
+//删除说说的方法
+-(UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    return UITableViewCellEditingStyleDelete;
+}
+//改变删除按钮的title
+- (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    return @"删除说说";
+}
+//删除用到的函数
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    if (editingStyle==UITableViewCellEditingStyleDelete) {
+        [self.frameArr removeObjectAtIndex:indexPath.row];
+        [tableView deleteRowsAtIndexPaths:[NSMutableArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        //        [[SHFMDB sharedSHFMDB]deleteWithTitle:self.frameArr[indexPath].cellFrame.cellItem.titleCopy context:self.frameArr[indexPath].cellFrame.cellItem.textCopy];
+        //
+    }
+}
+
 - (void)rightItemAction{
     //获取数据
     SHPostMoodController *postMood = [[SHPostMoodController alloc]init];

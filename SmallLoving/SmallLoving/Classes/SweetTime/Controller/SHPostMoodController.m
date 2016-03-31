@@ -32,9 +32,10 @@
     [super viewDidLoad];
     self.postMood = [[SHPostMood alloc]initWithFrame:[UIScreen mainScreen].bounds];
     self.view = self.postMood ;
+    self.view.backgroundColor = [UIColor whiteColor];
     self.navigationItem.title = @"书写心情";
     [self layoutView];
-    [self layoutViews];
+//    [self layoutViews];
     
     
 }
@@ -66,27 +67,27 @@
     
 }
 
-- (void)layoutViews{
-    THEditPhotoView *editPhotoView = [THEditPhotoView editPhotoView];
-    editPhotoView.frame = CGRectMake(10, 230, CWScreenW, 120);
-    editPhotoView.delegate = self ;
-    self.editPhotoView = editPhotoView ;
-    [self.view addSubview:editPhotoView];
-    //修复文本框是否偏移
-    self.automaticallyAdjustsScrollViewInsets = NO;
-}
+//- (void)layoutViews{
+//    THEditPhotoView *editPhotoView = [THEditPhotoView editPhotoView];
+//    editPhotoView.frame = CGRectMake(10, 230, CWScreenW, 120);
+//    editPhotoView.delegate = self ;
+//    self.editPhotoView = editPhotoView ;
+//    [self.view addSubview:editPhotoView];
+//    //修复文本框是否偏移
+//    self.automaticallyAdjustsScrollViewInsets = NO;
+//}
 
 - (void)rightBtnClick{
-    if(self.postMood.titleField.text.length ==0 &&self.postMood.textView.text.length == 0){
+    if(self.postMood.titleField.text.length ==0 &&self.postMood.textV.text.length == 0){
         //弹框显示
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"温馨提醒" message:@"请先输入心情内容" preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction *action1 = [UIAlertAction actionWithTitle:@"重新输入" style:UIAlertActionStyleDefault handler:^(UIAlertAction *_Nonnull action){
             
             [self.postMood.titleField becomeFirstResponder];
         }];
-        UIAlertAction *action2 = [UIAlertAction actionWithTitle:@"稍后 发布" style:UIAlertActionStyleCancel handler:^(UIAlertAction *_Nonnull action){
+        UIAlertAction *action2 = [UIAlertAction actionWithTitle:@"稍后发布" style:UIAlertActionStyleCancel handler:^(UIAlertAction *_Nonnull action){
             [self.postMood.titleField resignFirstResponder];
-            [self.postMood.textView resignFirstResponder];
+            [self.postMood.textV resignFirstResponder];
             [self.navigationController popViewControllerAnimated:YES];
         }];
         [alert addAction:action1];
@@ -96,13 +97,13 @@
         SHSweetSpaceController *sweetSpace = [[SHSweetSpaceController alloc]init];
         sweetSpace.pictureArr = self.array;
         //block传值
-        self.callValue(self.postMood.titleField.text,self.postMood.textView.text,self.array);
+        self.callValue(self.postMood.titleField.text,self.postMood.textV.text,self.array);
         NSString *icon = @"food";
         NSString *name = @"我们只想找到一份好工作";
         NSString *vip = @"1";
-        [[SHFMDB sharedSHFMDB]insertSpaceItem:self.spaceItem titleText:self.postMood.titleField.text icon:[NSString stringWithFormat:@"%@",icon] name:[NSString stringWithFormat:@"%@",name] contentText:self.postMood.textView.text];
-        self.spaceItem.titleText = self.titleField.text;
-        self.spaceItem.text = self.textView.text ;
+        [[SHFMDB sharedSHFMDB]insertSpaceItem:self.spaceItem titleText:self.postMood.titleField.text icon:[NSString stringWithFormat:@"%@",icon] name:[NSString stringWithFormat:@"%@",name] contentText:self.postMood.textV.text];
+        self.spaceItem.titleText = self.postMood.titleField.text;
+        self.spaceItem.text = self.postMood.textV.text ;
         self.spaceItem.icon = icon ;
         self.spaceItem.name = name;
         self.spaceItem.vip = vip;
@@ -131,24 +132,24 @@
     [self.view endEditing:YES];
 }
 #pragma mark - 各种代理方法
--(void)editPhotoViewToOpenAblum:(THEditPhotoView *)editView{
-    UIImagePickerController *pickView = [[UIImagePickerController alloc]init];
-    pickView.delegate = self;
-    pickView.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-    [self presentViewController:pickView animated:YES completion:nil];
-}
+//-(void)editPhotoViewToOpenAblum:(THEditPhotoView *)editView{
+//    UIImagePickerController *pickView = [[UIImagePickerController alloc]init];
+//    pickView.delegate = self;
+//    pickView.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+//    [self presentViewController:pickView animated:YES completion:nil];
+//}
 
 //点击图片成功
--(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingImage:(UIImage *)image editingInfo:(NSDictionary<NSString *,id> *)editingInfo{
-    
-    [self.editPhotoView addOneImage:image];
-    [self.array addObject:image];
-    [picker dismissViewControllerAnimated:YES completion:nil];
-}
-
+//-(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingImage:(UIImage *)image editingInfo:(NSDictionary<NSString *,id> *)editingInfo{
+//    
+//    [self.editPhotoView addOneImage:image];
+//    [self.array addObject:image];
+//    [picker dismissViewControllerAnimated:YES completion:nil];
+//}
+//
 //点击pickerview的取消，不加图片了
--(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker{
-    
-}
+//-(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker{
+//    
+//}
 
 @end
