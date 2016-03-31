@@ -29,14 +29,14 @@
 }
 
 - (void)layoutViews{
-    self.webView = [[UIWebView alloc]initWithFrame:CGRectMake(-100, 0, self.view.frame.size.width+200, self.view.frame.size.height)];
+    self.webView = [[UIWebView alloc]initWithFrame:CGRectMake(0, 0, kScreenW, kScreenH)];
     self.url = self.urlStr ;
     NSURL *url = [[NSURL alloc]initWithString:self.url];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     [self.webView loadRequest:request];
     self.webView.opaque = NO;
     self.webView.backgroundColor = [UIColor whiteColor];
-    self.view = self.webView ;
+    [self.view addSubview:self.webView];
     //self.webView.scalesPageToFit = YES ;
     UIBarButtonItem *leftButton = [[UIBarButtonItem alloc]initWithTitle:@"退出游戏" style:UIBarButtonItemStylePlain target:self action:@selector(leftButtonAction)];
     self.navigationItem.leftBarButtonItem = leftButton ;

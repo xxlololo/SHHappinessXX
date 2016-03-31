@@ -203,6 +203,7 @@
 
 //设置月经差多久到来
 - (void)setupAuntTowelSecondLabelWithAccountHome:(SHAccountHome *)accountHome{
+    
     //月经差几天到来
     NSDateComponents *cmps = [self auntTowelSecondLabelWithLastAuntDate:accountHome.lastAuntDate];
     long timeInterval = [accountHome.interval integerValue] - (long)cmps.day - 1;

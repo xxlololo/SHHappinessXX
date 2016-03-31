@@ -10,19 +10,23 @@
 #import "SHPhotoCollectionViewCell.h"
 #import "SHAccountTool.h"
 #import "SHAlbumToolBarView.h"
+#import "ZLPhotoPickerBrowserViewController.h"
+
 
 #define kWAndH ([UIScreen mainScreen].bounds.size.width - 25) / 4
 
-@interface SHAlbumViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate>
+@interface SHAlbumViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,ZLPhotoPickerBrowserViewControllerDelegate>
 @property(nonatomic,strong)UICollectionView *collectionView;
 @property (nonatomic, strong) NSMutableArray * photoArr;
 @property (nonatomic, assign) CellState cellState;
 @property (nonatomic, strong) SHAlbumToolBarView * toolBarView;
 @property (nonatomic, strong) NSMutableArray * selectPhotoArr;
 
+
 @end
 
 @implementation SHAlbumViewController
+
 
 - (NSMutableArray *)selectPhotoArr{
     if (!_selectPhotoArr) {
@@ -204,38 +208,32 @@
 }
 
 - (void)openAlbum{
-    //如果想自己写一个图片选择控制器 得利用AssetsLibrary.framework,利用这个框架获得手机上的所有相册图片
-    if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
-        return;
-    }
-    UIImagePickerController *ipc = [[UIImagePickerController alloc] init];
-    ipc.navigationBar.barStyle = UIBarStyleBlack;
     
-    ipc.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+    // 创建图片多选控制器
+    ZLPhotoPickerViewController *pickerVc = [[ZLPhotoPickerViewController alloc] init];
+    // 默认显示相册里面的内容SavePhotos
+    pickerVc.status = PickerViewShowStatusSavePhotos;
+    pickerVc.maxCount = 9;
+    [pickerVc showPickerVc:self];
+    // block回调或者代理
+    // 用block来代替代理
+    //    pickerVc.delegate = self;
     
-    ipc.delegate = self;
-    ipc.editing = YES;
-    ipc.allowsEditing = YES;
-    ipc.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-    [self presentViewController:ipc animated:YES completion:nil];
-    
-}
+    //     传值可以用代理，或者用block来接收，以下是block的传值
+    __weak typeof(self) weakSelf = self;
+    pickerVc.callBack = ^(NSArray<ZLPhotoAssets *> *status){
+        for (ZLPhotoAssets *photoAssets in status) {
 
-// UIImagePickerControllerDelegate
-//从控制器选择完图片后就调用(拍照完毕或者选择相册图片完毕)
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info{
-    [picker dismissViewControllerAnimated:YES completion:nil];
-    
-    //info中包含了选择的图片
-    UIImage *image = info[UIImagePickerControllerOriginalImage];
-    //获取账户信息
-    SHAccountHome *accountHome = [SHAccountTool account];
-    //添加图片到photoArray中
-    [self.photoArr addObject:image];
-    accountHome.photoArray = self.photoArr;
-    [self.collectionView reloadData];
-    //存储到沙盒
-    [SHAccountTool saveAccount:accountHome];
+            [weakSelf.photoArr addObject:photoAssets.originImage];
+        }
+        [weakSelf.collectionView reloadData];
+        //获取账户信息
+        SHAccountHome *accountHome = [SHAccountTool account];
+        //添加图片到photoArray中
+        accountHome.photoArray = weakSelf.photoArr;
+        //存储到沙盒
+        [SHAccountTool saveAccount:accountHome];
+    };
 }
 
 
@@ -252,7 +250,8 @@
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     SHPhotoCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
-    cell.photoImageView.image = self.photoArr[indexPath.row];
+    UIImage *photoImage = self.photoArr[indexPath.row];
+    cell.photoImageView.image = photoImage;
     if (self.cellState == NormalState) {
         cell.selectBtn.hidden = YES;
     }else{
@@ -262,14 +261,7 @@
     cell.selectBtn.selected = NO;
     return cell;
 }
-- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
-    
-    SHPhotoCollectionViewCell *cell = (SHPhotoCollectionViewCell*)[collectionView cellForItemAtIndexPath:indexPath];
-    if (!cell.selectBtn.hidden) {
-        [self selectBtnAction:cell.selectBtn];
-    }
-    return;
-}
+
 
 - (void)selectBtnAction:(UIButton *)button{
     button.selected = !button.selected;
@@ -293,7 +285,41 @@
 }
 
 #pragma mark <UICollectionViewDelegate>
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+    
+    SHPhotoCollectionViewCell *cell = (SHPhotoCollectionViewCell*)[collectionView cellForItemAtIndexPath:indexPath];
+    if (!cell.selectBtn.hidden) {
+        [self selectBtnAction:cell.selectBtn];
+    }else{
+        // 图片游览器
+        ZLPhotoPickerBrowserViewController *pickerBrowser = [[ZLPhotoPickerBrowserViewController alloc] init];
+        // 淡入淡出效果
+        // pickerBrowser.status = UIViewAnimationAnimationStatusFade;
+        // 数据源/delegate
+        pickerBrowser.editing = YES;
+        pickerBrowser.photos = self.photoArr;
+        // 能够删除
+        pickerBrowser.delegate = self;
+        // 当前选中的值
+        pickerBrowser.currentIndex = indexPath.row;
+        // 展示控制器
+        [pickerBrowser showPickerVc:self];
+    }
+    return;
+}
 
+- (void)photoBrowser:(ZLPhotoPickerBrowserViewController *)photoBrowser removePhotoAtIndex:(NSInteger)index{
+    if (self.photoArr.count > index) {
+        [self.photoArr removeObjectAtIndex:index];
+        //获取账户信息
+        SHAccountHome *accountHome = [SHAccountTool account];
+        //添加图片到photoArray中
+        accountHome.photoArray = self.photoArr;
+        //存储到沙盒
+        [SHAccountTool saveAccount:accountHome];
+        [self.collectionView reloadData];
+    }
+}
 
 
 @end
