@@ -50,8 +50,15 @@
     CGSize textSize = [self sizeWithText:self.spaceItem.text font:kTextFont maxSize:CGSizeMake(kWith, MAXFLOAT)];
     _textF = CGRectMake(textX, textY, textSize.width, textSize.height);
     NSLog(@"%f,111%f",textSize.height,textSize.width-100);
-    
-    //6.配图
+    //date显示
+    CGFloat dateX = iconX;
+    CGFloat dateY = CGRectGetMaxY(_textF)+padding;
+    CGFloat dataW = kWith;
+    _dataF = CGRectMake(dateX, dateY, dataW, 25);
+    //6.cell之间的分割线
+    _cellView = CGRectMake(iconX, CGRectGetMaxY(_dataF)+5, kScreenW-20, 2);
+
+    //7.配图
     
     if (self.spaceItem.picture) {
         //有配图
@@ -62,9 +69,10 @@
         _pictureF = CGRectMake(pictureX, pictureY, pictureW, pictureH);
         //7.cell的高度
         // _cellHeight = CGRectGetMaxY(_pictureF)+padding;
-        _cellHeight = CGRectGetMaxY(_textF)+self.imageFrame.frame.size.height;
+        _cellHeight = CGRectGetMaxY(_cellView)+self.imageFrame.frame.size.height;
     }else{
-        _cellHeight = CGRectGetMaxY(_textF)+padding;
+        _cellHeight = CGRectGetMaxY(_cellView)+padding;
     }
-}
+    
+   }
 @end

@@ -24,6 +24,10 @@
 @property (nonatomic,weak)UILabel *textView;
 //6.配图
 @property (nonatomic,strong)UIView *pictureView;
+//7.cell之间的分割线
+@property (nonatomic,strong)UIView *cellView;
+
+@property (nonatomic,strong)UILabel *dateView;
 @property (nonatomic,strong)SHImageFrame *imageFrame;
 @property (nonatomic,strong)SHSingleArray *singleArray;
 
@@ -62,6 +66,16 @@
         UIView *imageV = [[UIView alloc]init];
         [self.contentView addSubview:imageV];
         self.pictureView = imageV;
+        //7.cell之间的分割线
+        UIView *cellView = [[UIView alloc]init];
+        [self.contentView addSubview:cellView];
+        self.cellView = cellView;
+        //date
+        UILabel *dateView = [[UILabel alloc]init];
+        [self.contentView addSubview:dateView];
+        self.dateView = dateView;
+
+        
     }
     return self;
 }
@@ -105,6 +119,7 @@
     self.titleView.text = spaceItem.titleText;
     //4.正文
     self.textView.text = spaceItem.text;
+    self.dateView.text = spaceItem.dateText;
     //5.配图
     if (spaceItem.picture) {//有配图
         self.pictureView.hidden = NO;
@@ -140,6 +155,9 @@
         self.pictureView.hidden = YES;
     }
     
+    //cell之间的分割线
+    self.cellView.backgroundColor = [UIColor grayColor];
+    self.cellView.alpha = 0.6;
 }
 
 - (void)settingFrame{
@@ -153,10 +171,16 @@
     self.titleView.frame = self.cellItem.titleF;
     //4.正文
     self.textView.frame = self.cellItem.textF;
+    //cellView
+    self.cellView.frame = self.cellItem.cellView;
     //5.配图
     if (self.cellItem.spaceItem.picture) {
         //有配图
         self.pictureView.frame = self.cellItem.pictureF;
         
-    }}
+    }
+    self.dateView.frame = self.cellItem.dataF ;
+}
+
+
 @end

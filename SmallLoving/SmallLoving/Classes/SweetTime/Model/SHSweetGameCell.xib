@@ -35,7 +35,7 @@
                         <state key="normal" title="Button" image="start1.png"/>
                     </button>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="smstitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mny-Wb-u3p">
-                        <rect key="frame" x="95" y="47" width="149" height="16"/>
+                        <rect key="frame" x="95" y="47" width="149" height="28"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="193" id="Fm3-do-3Aq"/>
                             <constraint firstAttribute="height" constant="26" id="HVd-76-WGx"/>
@@ -72,7 +72,7 @@
                     <constraint firstItem="ikc-7r-hEv" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="28" id="L71-dr-FWT"/>
                     <constraint firstItem="mny-Wb-u3p" firstAttribute="top" secondItem="787-E0-Pa9" secondAttribute="bottom" constant="17" id="Mc5-8d-igG"/>
                     <constraint firstAttribute="bottom" secondItem="iqu-1F-x2l" secondAttribute="bottom" constant="10" id="NvR-eC-sDu"/>
-                    <constraint firstAttribute="bottom" secondItem="mny-Wb-u3p" secondAttribute="bottom" constant="25" id="Oe9-6R-2cJ"/>
+                    <constraint firstAttribute="bottom" secondItem="mny-Wb-u3p" secondAttribute="bottom" constant="20" id="Oe9-6R-2cJ"/>
                     <constraint firstItem="iqu-1F-x2l" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="25" id="QaI-FX-57G"/>
                     <constraint firstAttribute="bottomMargin" secondItem="iqu-1F-x2l" secondAttribute="bottom" constant="5" id="VE8-9G-2Q1">
                         <variation key="heightClass=regular-widthClass=compact" constant="-4"/>

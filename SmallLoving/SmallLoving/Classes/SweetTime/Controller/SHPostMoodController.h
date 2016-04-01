@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+
 //1.定义一个blocK类型
 typedef void(^CallValue)(NSString *,NSString *,NSMutableArray *);
 @interface SHPostMoodController : UIViewController<UITextViewDelegate>{
@@ -21,5 +22,6 @@ typedef void(^CallValue)(NSString *,NSString *,NSMutableArray *);
 @property (nonatomic,strong)UITextView *textView;
 @property (nonatomic,strong)UILabel *textLabel;
 
-
+@property (nonatomic,strong)NSString *titleString;
+@property (nonatomic,strong)NSString *textString;
 @end

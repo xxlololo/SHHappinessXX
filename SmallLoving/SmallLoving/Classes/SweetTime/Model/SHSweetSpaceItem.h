@@ -19,10 +19,11 @@
 @property (nonatomic,strong)NSString *titleText;
 //图文
 @property (nonatomic,strong)NSString *picture;
+@property (nonatomic,strong)NSString *dateText;
 //是否是vip
 @property (nonatomic,assign)BOOL vip;
 
 - (instancetype)initWithDict:(NSDictionary *)dict;
 + (instancetype)spaceWithDic:(NSDictionary *)dict;
-- (instancetype)spaceWithTitel:(NSString *)titleText icon:(NSString *)icon name:(NSString *)name text:(NSString *)text;
+- (instancetype)spaceWithTitel:(NSString *)titleText icon:(NSString *)icon name:(NSString *)name text:(NSString *)text date:(NSString *)dateText;
 @end

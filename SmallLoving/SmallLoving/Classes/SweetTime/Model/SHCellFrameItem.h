@@ -34,10 +34,17 @@
  */
 @property (nonatomic,assign,readonly)CGRect pictureF;
 /**
+ *  date显示
+ */
+@property (nonatomic,assign,readonly)CGRect  dataF;
+/**
  *  cell的高度
  */
 @property (nonatomic,assign,readonly)CGFloat cellHeight;
-
+/**
+ *  cell之间的分割线
+ */
+@property (nonatomic,assign,readonly)CGRect cellView;
 @property (nonatomic,strong)SHSweetSpaceItem *spaceItem;
 @property (nonatomic,strong)SHImageFrame *imageFrame;
 @end

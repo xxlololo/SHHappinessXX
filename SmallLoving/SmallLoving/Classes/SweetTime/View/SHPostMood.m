@@ -18,14 +18,8 @@
 #import "SHPostMood.h"
 @interface SHPostMood()<UITextFieldDelegate,UITextViewDelegate>
 
-//猫的手
-@property (strong,nonatomic) UIImageView *lefthand;
-@property (strong,nonatomic) UIImageView *righthand;
+@property (assign,nonatomic) ClickType clicktype;
 
-
-//猫的蒙眼胳膊
-@property (strong,nonatomic) UIImageView *lefthArm;
-@property (strong,nonatomic) UIImageView *rightArm;
 @end
 
 @implementation SHPostMood
@@ -33,9 +27,10 @@
     self = [super initWithFrame:frame];
     if (self) {
         [self loadViews];
-    }
+            }
     return self;
 }
+
 
 - (void)loadViews{
     
@@ -43,6 +38,12 @@
     
     header.image=[UIImage imageNamed:@"header"];
     [self addSubview:header];
+    
+    //添加button 点击触发动画
+    self.headButton = [[UIButton alloc]initWithFrame:CGRectMake(0, 0, 211, 109)];
+    self.headButton.backgroundColor = [UIColor clearColor];
+  
+
     
     _lefthArm=[[UIImageView alloc]initWithFrame:rectLeftArm];
     _lefthArm.image=[UIImage imageNamed:@"left"];
@@ -52,8 +53,9 @@
     _rightArm=[[UIImageView alloc]initWithFrame:rectRightArm];
     _rightArm.image=[UIImage imageNamed:@"right"];
     [header addSubview:_rightArm];
-    
-    
+    [header addSubview:self.headButton];
+    [header bringSubviewToFront:self.headButton];
+    header.userInteractionEnabled = YES ;
     UIView *loginview=[[UIView alloc]initWithFrame:CGRectMake(15, 140, kWidth-30, 260)];
     loginview.layer.borderWidth=1;
     loginview.layer.borderColor=[UIColor lightGrayColor].CGColor;
@@ -77,6 +79,7 @@
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 44, 44)];
     titleLabel.text = @"标题:";
     [self.titleField.leftView addSubview:titleLabel];
+    
     [loginview addSubview:self.titleField];
     
     UIImageView* pssimag = [[UIImageView alloc] initWithFrame:CGRectMake(11, 11, 22, 22)];
@@ -91,12 +94,15 @@
     self.textV.layer.cornerRadius = 6.0f;
     self.textV.layer.borderWidth = 2;
     self.textV.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    self.textV.userInteractionEnabled = YES ;
     [loginview addSubview:self.textV];
     //创建Label 加提示语
     self.promptTitle = [[UILabel alloc]initWithFrame:CGRectMake(5,5,100,20)];
     self.promptTitle.text = @"最多可输入140字";
     self.promptTitle.font = [UIFont systemFontOfSize:12.0];
-    [self.promptTitle setTextColor:[UIColor colorWithRed:190/255.0 green:190/255.0 blue:190/255.0 alpha:0.8]];    //
+    [self.promptTitle setTextColor:[UIColor colorWithRed:190/255.0 green:190/255.0 blue:190/255.0 alpha:0.8]];
+    
+    self.promptTitle.hidden=NO;
     [self.textV addSubview:self.promptTitle];
 
 }
@@ -114,9 +120,7 @@
     }
     else {
         if (self.textV.text.length - range.length + text.length > 140) {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"超出最大可输入长度" message:nil delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil];//如果输入的文字大于140 则提示 <span style="font-family: Arial, Helvetica, sans-serif;">"超出最大可输入长度" 并不能继续输入文字</span>
-            
-            [alert show];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"超出最大可输入长度" message:nil delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil];            [alert show];
             return NO;
         }
         else {
@@ -125,6 +129,44 @@
     }
 }
 
+-(void)textFieldDidBeginEditing:(UITextField *)textField{
+    if ([textField isEqual:_titleField]) {
+        if (_clicktype != clicktypePass) {
+            _clicktype =clicktypeUser;
+            return;
+        }
+        _clicktype=clicktypeUser;
+        
+        [UIView animateWithDuration:0.5 animations:^{
+            self.lefthArm.frame = CGRectMake(self.lefthArm.frame.origin.x - 60, self.lefthArm.frame.origin.y + 30, self.lefthArm.frame.size.width, self.lefthArm.frame.size.height);
+            
+            self.rightArm.frame = CGRectMake(self.rightArm.frame.origin.x+48, self.rightArm.frame.origin.y + 30, self.rightArm.frame.size.width, self.rightArm.frame.size.height);
+            
+            self.lefthand.frame = CGRectMake(self.lefthand.frame.origin.x-70, self.lefthand.frame.origin.y, 40, 40);
+            self.righthand.frame = CGRectMake(self.righthand.frame.origin.x +30, self.righthand.frame.origin.y, 40, 40);
+        } completion:^(BOOL finished) {
+            
+        }];
+    }else if ([textField isEqual:_titleField]){
+        if (_clicktype == clicktypePass)
+        {
+            return;
+        }
+        _clicktype = clicktypePass;
+        
+        [UIView animateWithDuration:0.5 animations:^{
+            self.lefthArm.frame = CGRectMake(self.lefthArm.frame.origin.x + 60, self.lefthArm.frame.origin.y - 30, self.lefthArm.frame.size.width, self.lefthArm.frame.size.height);
+            
+            self.rightArm.frame = CGRectMake(self.rightArm.frame.origin.x - 48, self.rightArm.frame.origin.y - 30, self.rightArm.frame.size.width, self.rightArm.frame.size.height);
+            
+            self.lefthand.frame = CGRectMake(self.lefthand.frame.origin.x + 70, self.lefthand.frame.origin.y, 0, 0);
+            self.righthand.frame = CGRectMake(self.righthand.frame.origin.x - 30, self.righthand.frame.origin.y, 0, 0);
+        } completion:^(BOOL finished) {
+            
+        }];
+    }
+    
+}
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField{
     

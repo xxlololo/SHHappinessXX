@@ -14,11 +14,12 @@
 #import "SHPostMood.h"
 #import "SHFMDB.h"
 #import "SHSweetSpaceItem.h"
-@interface SHPostMoodController ()<UINavigationControllerDelegate,UIImagePickerControllerDelegate,THEditPhotoViewDelegate>
+#import "SHPostMoodController.h"
+@interface SHPostMoodController ()<UINavigationControllerDelegate,UIImagePickerControllerDelegate,THEditPhotoViewDelegate,UITextViewDelegate>
 @property (nonatomic,weak)THEditPhotoView *editPhotoView;
 @property (nonatomic,strong)SHPostMood *postMood;
 @property (nonatomic,strong)SHSweetSpaceItem *spaceItem;
-#import "SHPostMoodController.h"
+
 
 @end
 @interface SHPostMoodController ()
@@ -35,6 +36,8 @@
     self.view.backgroundColor = [UIColor whiteColor];
     self.navigationItem.title = @"书写心情";
     [self layoutView];
+    self.postMood.headButton.userInteractionEnabled =YES ;
+    self.postMood.textV.delegate = self ;
 //    [self layoutViews];
     
     
@@ -66,6 +69,14 @@
     
     
 }
+- (void)textViewDidBeginEditing:(UITextView *)textView{
+    self.postMood.promptTitle.hidden = YES;
+
+    
+}
+
+
+
 
 //- (void)layoutViews{
 //    THEditPhotoView *editPhotoView = [THEditPhotoView editPhotoView];
@@ -98,12 +109,29 @@
         sweetSpace.pictureArr = self.array;
         //block传值
         self.callValue(self.postMood.titleField.text,self.postMood.textV.text,self.array);
-        NSString *icon = @"food";
-        NSString *name = @"我们只想找到一份好工作";
+        
+        NSString *icon = @"hero";
+        NSString *name = @"小幸福";
         NSString *vip = @"1";
-        [[SHFMDB sharedSHFMDB]insertSpaceItem:self.spaceItem titleText:self.postMood.titleField.text icon:[NSString stringWithFormat:@"%@",icon] name:[NSString stringWithFormat:@"%@",name] contentText:self.postMood.textV.text];
-        self.spaceItem.titleText = self.postMood.titleField.text;
-        self.spaceItem.text = self.postMood.textV.text ;
+        NSDate *date = [NSDate dateWithTimeIntervalSinceNow:0];
+        NSDateFormatter *formatter =[[NSDateFormatter alloc] init];
+        formatter.dateFormat = @"YYYY-MM-dd";
+        if ([self.postMood.titleField.text isEqualToString:@""]) {
+            self.titleString = @"(没有标题)";
+            
+        }else{
+         self.titleString = self.postMood.titleField.text;
+
+        }
+        if ([self.postMood.textV.text isEqualToString:@""]) {
+            self.textString = @"(没有内容)";
+        }else{
+            self.textString = self.postMood.textV.text;
+        }
+        NSString *timestamp = [formatter stringFromDate:date];
+        [[SHFMDB sharedSHFMDB]insertSpaceItem:self.spaceItem titleText:self.titleString icon:[NSString stringWithFormat:@"%@",icon] name:[NSString stringWithFormat:@"%@",name] contentText:self.textString dateText:timestamp];
+        self.spaceItem.titleText = self.titleString;
+        self.spaceItem.text = self.textString ;
         self.spaceItem.icon = icon ;
         self.spaceItem.name = name;
         self.spaceItem.vip = vip;

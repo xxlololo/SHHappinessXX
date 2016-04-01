@@ -18,7 +18,7 @@
 - (void)openFMDB;
 
 #pragma mark ----------添加数据-------------
-- (void)insertSpaceItem:(SHSweetSpaceItem *)spaceItem titleText:(NSString *)titleText icon:(NSString *)icon name:(NSString *)name contentText:(NSString*)contentText;
+- (void)insertSpaceItem:(SHSweetSpaceItem *)spaceItem titleText:(NSString *)titleText icon:(NSString *)icon name:(NSString *)name contentText:(NSString*)contentText dateText:(NSString *)dateText;
 
 #pragma mark ----------查询数据-------------
 - (NSArray *)selectAllSpaceItem;

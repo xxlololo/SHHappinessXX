@@ -5,7 +5,7 @@
 	<array>
 		<dict>
 			<key>icon</key>
-			<string>2048.png</string>
+			<string>game.png</string>
 			<key>title</key>
 			<string>情侣版2048</string>
 			<key>smstitle</key>

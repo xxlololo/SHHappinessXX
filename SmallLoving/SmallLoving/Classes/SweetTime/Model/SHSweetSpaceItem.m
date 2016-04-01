@@ -22,13 +22,14 @@
     return [[self alloc]initWithDict:dict];
     
 }
-- (instancetype)spaceWithTitel:(NSString *)titleText icon:(NSString *)icon name:(NSString *)name text:(NSString *)text{
+- (instancetype)spaceWithTitel:(NSString *)titleText icon:(NSString *)icon name:(NSString *)name text:(NSString *)text date:(NSString *)dateText{
     
     if (self == [super init]) {
         self.titleText = titleText;
         self.icon = icon ;
         self.name = name ;
         self.text =text ;
+        self.dateText = dateText;
     }
     return self;
 }

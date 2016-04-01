@@ -49,10 +49,10 @@
     [self layoutViews];
     self.singleArray = [SHSingleArray shareSHSingArray];
     [[SHFMDB sharedSHFMDB]openFMDB];
-    UIView *llview = [[UIView alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 220)];
+    UIView *llview = [[UIView alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, kScreenHeight*0.33+20)];
     //背景图片
-    self.headerImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, kScreenWith, 220)];
-    self.headerImageView.image = [UIImage imageNamed:@"image1.png"];
+    self.headerImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, kScreenWith, kScreenHeight*0.33)];
+    self.headerImageView.image = [UIImage imageNamed:@"image0.png"];
     
     //去掉背景图片
     //    [self.navigationController.navigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
@@ -70,36 +70,40 @@
     //    [self.navigationController.navigationBar addSubview:backView];
     //    self.backView = backView;
     //    self.backColor = backColor;
-    
+    //用户名称
+    self.label = [[UILabel alloc]initWithFrame:CGRectMake(0, self.headerContentView.bounds.size.height-30, kScreenWith-76, 30)];
+    //调用数据库/leancloud中用户名称
+    self.label.text = @"小幸福";
+    self.label.textAlignment = NSTextAlignmentRight;
+    self.label.textColor = [UIColor brownColor];
+    self.label.backgroundColor = [UIColor clearColor];
+    self.label.font = [UIFont boldSystemFontOfSize:18];
+    [llview addSubview:self.label];
     //信息内容
-    CGRect icon_frame = CGRectMake([UIScreen mainScreen].bounds.size.width-72, self.headerContentView.bounds.size.height-30, 60, 60);
+    CGRect icon_frame = CGRectMake([UIScreen mainScreen].bounds.size.width-70, self.headerContentView.bounds.size.height-40, 60, 60);
 
     UIImageView *icon = [[UIImageView alloc] initWithFrame:icon_frame];
     icon.backgroundColor = [UIColor clearColor];
-    icon.image = [UIImage imageNamed:@"game.png"];
-   // icon.layer.cornerRadius = 80/2.0f;
+    //调用用户图片
+    icon.image = [UIImage imageNamed:@"hero.png"];
     icon.layer.masksToBounds = YES;
-    icon.layer.borderWidth = 1.0f;
-    icon.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    icon.layer.borderWidth = 3.0f;
+    icon.layer.borderColor = [UIColor whiteColor].CGColor;
     [self.headerContentView addSubview:self.headerImageView];
-   // [self.headerContentView addSubview:icon];
+    [llview addSubview:icon];
     self.icon = icon;
-    
-//    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(108, self.headerContentView.bounds.size.height-60-12, kScreenWith-108-12, 50)];
-//    label.text = @"真羡慕你们这些人, 年纪轻轻的就认识了才华横溢的我!";
-//    label.textColor = [UIColor whiteColor];
-//    label.font = [UIFont systemFontOfSize:15];
-//    label.numberOfLines = 0;
-//    self.label = label;
-//    [self.headerContentView addSubview:self.label];
     [llview addSubview:self.headerContentView];
+    [llview bringSubviewToFront:self.label];
+    [llview bringSubviewToFront:icon];
+    llview.layer.borderColor = [UIColor redColor].CGColor;
     self.tableView.tableHeaderView = llview;
+    self. tableView.separatorStyle = UITableViewCellSelectionStyleNone;
     self.automaticallyAdjustsScrollViewInsets = NO ;
     self.navigationController.navigationBar.translucent = NO;
     //雪花效果
-    //    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(handleAction:)];
-    //
-    //    [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+//        self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(handleAction:)];
+//    
+//        [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
     
 }
 
@@ -107,24 +111,24 @@
     CGFloat offset_Y = scrollView.contentOffset.y;
     CGFloat alpha = (offset_Y + 40)/300.0f;
     self.backView.backgroundColor = [self.backColor colorWithAlphaComponent:alpha];
-    
     if (offset_Y <0) {
         //放大比例
         CGFloat add_topHeight = -offset_Y;
-        self.scale = (220+add_topHeight)/220;
+        self.scale = (kScreenHeight*0.33+add_topHeight)/(kScreenHeight*0.33);
         //改变 frame
-        CGRect contentView_frame = CGRectMake(0, -add_topHeight, kScreenWith, 220+add_topHeight);
+        CGRect contentView_frame = CGRectMake(0, -add_topHeight, kScreenWith, kScreenHeight*0.33+add_topHeight);
         self.headerContentView.frame = contentView_frame;
-        CGRect imageView_frame = CGRectMake(0,
+        CGRect imageView_frame = CGRectMake(-(kScreenWith*self.scale-kScreenWith)/2.0f,
                                             0,
-                                            kScreenWith,
-                                            220+add_topHeight);
+                                            kScreenWith*self.scale,
+                                            kScreenHeight*0.33+add_topHeight);
         self.headerImageView.frame = imageView_frame;
-        
-        CGRect icon_frame = CGRectMake(12, self.headerContentView.bounds.size.height-30, 60, 60);
+
+    
+       CGRect icon_frame = CGRectMake([UIScreen mainScreen].bounds.size.width-70, (self.headerContentView.bounds.size.height-40)-add_topHeight, 60, 60);
         self.icon.frame = icon_frame;
-        
-        
+       CGRect label_frame = CGRectMake(0, self.headerContentView.bounds.size.height-30-add_topHeight, kScreenWith-76, 30);
+        self.label.frame =label_frame;
     }
     
 }
@@ -150,7 +154,8 @@
     [self.tableView reloadData];
     
 }
-//删除说说的方法
+/**
+ *删除说说的方法
 -(UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath{
     
     return UITableViewCellEditingStyleDelete;
@@ -170,6 +175,9 @@
         //
     }
 }
+
+ *
+ */
 
 - (void)rightItemAction{
     //获取数据
@@ -255,24 +263,22 @@
 /**
  *  获取雪花特效
  */
-/**
- *
- *- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
  [self.displayLink invalidate];
  self.displayLink = nil;
  }
  - (void)handleAction:(CADisplayLink *)displayLink{
  
- UIImage *image = [UIImage imageNamed:@"heart"];
+ UIImage *image = [UIImage imageNamed:@"雪花"];
  UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
  CGFloat scale = arc4random_uniform(60) / 100.0;
  imageView.transform = CGAffineTransformMakeScale(scale, scale);
- CGSize winSize = self.view.bounds.size;
+ CGSize winSize = self.tableView.bounds.size;
  CGFloat x = arc4random_uniform(winSize.width);
  CGFloat y = - imageView.frame.size.height;
  imageView.center = CGPointMake(x, y);
  
- [self.view addSubview:imageView];
+ [self.tableView addSubview:imageView];
  [UIView animateWithDuration:arc4random_uniform(10) animations:^{
  CGFloat toX = arc4random_uniform(winSize.width);
  CGFloat toY = imageView.frame.size.height * 0.5 + winSize.height;
@@ -288,5 +294,5 @@
  
  }
  
- */
+
 @end
