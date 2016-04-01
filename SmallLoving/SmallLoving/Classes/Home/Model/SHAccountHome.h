@@ -17,4 +17,6 @@
 @property (nonatomic, strong)NSString *interval;//姨妈时间间隔
 @property (nonatomic, strong) NSString * isMenstruation;//是否正在姨妈期
 @property (nonatomic, strong) NSMutableArray *photoArray;//相册数组
+@property(nonatomic, strong)NSMutableArray *memorialArray;//纪念日数组
+
 @end

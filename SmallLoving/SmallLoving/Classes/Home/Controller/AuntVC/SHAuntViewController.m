@@ -112,7 +112,7 @@
 - (void)timeChangeAction{
     //获取账户信息
     SHAccountHome *accountHome = [SHAccountTool account];
-    if ([accountHome.isMenstruation isEqualToString:@"NO"]) {
+    if ([accountHome.isMenstruation isEqualToString:@"NO"] || self.auntIsComingView.auntTowelFirstLabel.text) {
         [self.auntIsComingView setupAuntTowelSecondLabelWithAccountHome:accountHome];
     }
 }

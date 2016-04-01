@@ -7,8 +7,15 @@
 //
 
 #import "SHMemorialTableViewController.h"
+#import "SHHeaderView.h"
+#import "SHMemorialTableViewCell.h"
+#import "SHAddMemorialTableViewController.h"
+#import "SHAccountTool.h"
+#import "SHMemorialModel.h"
+#import "NSDate+XWBExtension.h"
 
 @interface SHMemorialTableViewController ()
+@property(nonatomic, strong)SHHeaderView *headerView;
 
 @end
 
@@ -17,7 +24,35 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setNavigationBar];
+    [self.tableView registerClass:[SHMemorialTableViewCell class] forCellReuseIdentifier:@"cell"];
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    self.tableView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1];
+    self.tableView.contentInset = UIEdgeInsetsMake(110, 0, 0, 0);
     self.tabBarController.tabBar.hidden = YES;
+    SHAccountHome *account = [SHAccountTool account];
+    if (!account.memorialArray) {
+        SHAddMemorialTableViewController *addMemorialTVC = [[SHAddMemorialTableViewController alloc] init];
+        [self.navigationController pushViewController:addMemorialTVC animated:YES];
+    }
+}
+
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    self.headerView = [[SHHeaderView alloc] initWithFrame:CGRectMake(0, 64, kScreenW, 100)];
+    //获得最上面的窗口
+    UIWindow *window = [UIApplication sharedApplication].keyWindow;
+    SHAccountHome *account = [SHAccountTool account];
+    if (account.memorialArray) {
+        SHMemorialModel *memorialModel = account.memorialArray[0];
+        [self.headerView setupHeaderViewLabelWithLoveDate:memorialModel.memorialDate];
+    }
+    [window addSubview:self.headerView];
+    [self.tableView reloadData];
+}
+
+- (void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    [self.headerView removeFromSuperview];
 }
 
 //设置导航栏
@@ -39,7 +74,8 @@
 }
 
 - (void)rightItemAction:(UIBarButtonItem *)rightItem{
-    
+    SHAddMemorialTableViewController *addMemorialTVC = [[SHAddMemorialTableViewController alloc] init];
+    [self.navigationController pushViewController:addMemorialTVC animated:YES];
 }
 
 
@@ -48,67 +84,61 @@
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-#warning Incomplete implementation, return the number of sections
-    return 0;
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-#warning Incomplete implementation, return the number of rows
-    return 0;
+    SHAccountHome *account = [SHAccountTool account];
+    return account.memorialArray.count;
 }
 
-/*
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:<#@"reuseIdentifier"#> forIndexPath:indexPath];
-    
-    // Configure the cell...
-    
+    SHMemorialTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+    SHAccountHome *account = [SHAccountTool account];
+    if (indexPath.row == 0) {
+        UIImage *backgroundImage = [UIImage imageNamed:@"extension-anniversary-cell-bg-pink"];
+        CGFloat top = 10; // 顶端盖高度
+        CGFloat bottom = 10; // 底端盖高度
+        CGFloat left = 20; // 左端盖宽度
+        CGFloat right = 120; // 右端盖宽度
+        UIEdgeInsets insets = UIEdgeInsetsMake(top, left, bottom, right);
+        // 指定为拉伸模式，伸缩后重新赋值
+        backgroundImage = [backgroundImage resizableImageWithCapInsets:insets resizingMode:UIImageResizingModeStretch];
+        cell.backgroundImageView.image = backgroundImage;
+        cell.leftImageView.image = [UIImage imageNamed:@"extension_anniversary-timeline-icon-due"];
+        cell.memorialNameLabel.text = @"我们已相爱";
+        NSDate *date = [NSDate date];
+        SHMemorialModel *memorialModel = account.memorialArray[0];
+        NSTimeInterval timeInterval = [date timeIntervalSinceDate:memorialModel.memorialDate];
+        cell.dayLabel.text = [NSString stringWithFormat:@"%d",(int)(timeInterval/86400)];
+    }else{
+        UIImage *backgroundImage = [UIImage imageNamed:@"extension-anniversary-cell-bg-blue"];
+        CGFloat top = 10; // 顶端盖高度
+        CGFloat bottom = 10; // 底端盖高度
+        CGFloat left = 20; // 左端盖宽度
+        CGFloat right = 120; // 右端盖宽度
+        UIEdgeInsets insets = UIEdgeInsetsMake(top, left, bottom, right);
+        // 指定为拉伸模式，伸缩后重新赋值
+        backgroundImage = [backgroundImage resizableImageWithCapInsets:insets resizingMode:UIImageResizingModeStretch];
+        cell.backgroundImageView.image = backgroundImage;
+        cell.leftImageView.image = [UIImage imageNamed:@"extension_anniversary-timeline-icon-normal"];
+        SHMemorialModel *memorialModel = account.memorialArray[indexPath.row];
+        cell.memorialNameLabel.text = [NSString stringWithFormat:@"距离%@还有",memorialModel.memorialName];
+        cell.dayLabel.text = [memorialModel.memorialDate getDaySinceMemorial];
+    }
     return cell;
 }
-*/
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    return 35;
 }
-*/
 
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    SHAddMemorialTableViewController *addMemorialTVC = [[SHAddMemorialTableViewController alloc] init];
+    addMemorialTVC.indexRow = [NSString stringWithFormat:@"%ld",(long)indexPath.row];
+    [self.navigationController pushViewController:addMemorialTVC animated:YES];
+
 }
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

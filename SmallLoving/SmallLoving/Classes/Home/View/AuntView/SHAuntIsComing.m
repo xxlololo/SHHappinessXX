@@ -158,7 +158,7 @@
     //月经差几天到来
     NSDateComponents *cmps = [self auntTowelSecondLabelWithLastAuntDate:accountHome.lastAuntDate];
     if (accountHome.lastAuntDate) {//如果设置了月经信息
-        if (labs([accountHome.interval integerValue] -(long)cmps.day) > 3) {//如果天数大于三天
+        if (labs([accountHome.interval integerValue] - (long)cmps.day % [accountHome.interval integerValue]) > 3) {//如果天数大于三天
             if ([accountHome.sex isEqualToString:@"m"]) {//如果是男性
                 self.manLabel.hidden = NO;
                 self.womanBtn.hidden = YES;
@@ -203,12 +203,13 @@
 
 //设置月经差多久到来
 - (void)setupAuntTowelSecondLabelWithAccountHome:(SHAccountHome *)accountHome{
-    
     //月经差几天到来
     NSDateComponents *cmps = [self auntTowelSecondLabelWithLastAuntDate:accountHome.lastAuntDate];
-    long timeInterval = [accountHome.interval integerValue] - (long)cmps.day - 1;
-    long multiple = (long)cmps.day / [accountHome.interval integerValue];
-    self.auntTowelSecondLabel.text = [NSString stringWithFormat:@"%ld天%ld小时%ld分%ld秒",timeInterval + multiple * [accountHome.interval integerValue], 24 - (long)cmps.hour, 60 - (long)cmps.minute, 60 - (long)cmps.second];
+     long timeInterval = [accountHome.interval integerValue] - (long)cmps.day % [accountHome.interval integerValue];
+    self.auntTowelSecondLabel.text = [NSString stringWithFormat:@"%ld天%ld小时%ld分%ld秒",timeInterval, 24 - (long)cmps.hour, 60 - (long)cmps.minute, 60 - (long)cmps.second];
+//    long timeInterval = [accountHome.interval integerValue] - (long)cmps.day - 1;
+//    long multiple = (long)cmps.day / [accountHome.interval integerValue];
+//    self.auntTowelSecondLabel.text = [NSString stringWithFormat:@"%ld天%ld小时%ld分%ld秒",timeInterval + multiple * [accountHome.interval integerValue], 24 - (long)cmps.hour, 60 - (long)cmps.minute, 60 - (long)cmps.second];
 }
 
 - (NSDateComponents *)auntTowelSecondLabelWithLastAuntDate:(NSDate *)date{
@@ -217,7 +218,7 @@
     //日历对象(方便比较两个日期之间的差距)
     NSCalendar *calendar = [NSCalendar currentCalendar];
     //NSCalendarUnit枚举代想获得哪些差值
-    NSCalendarUnit unit = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
+    NSCalendarUnit unit = NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
     //计算两个日期之间的差值
     NSDateComponents *cmps = [calendar components:unit fromDate:date toDate:now options:0];
     return cmps;
