@@ -15,4 +15,6 @@
 - (BOOL)isYesterday;
 //判断某个时间是不是今天
 - (BOOL)isToday;
+//计算今天距离纪念日还有几天
+- (NSString *)getDaySinceMemorial;
 @end

@@ -154,7 +154,12 @@
 		F0016D511CABE2BE00DF38F9 /* ZLPhotoPickerGroupTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F0016D331CABE2BE00DF38F9 /* ZLPhotoPickerGroupTableViewCell.m */; };
 		F0016D521CABE2BE00DF38F9 /* ZLPhotoPickerImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = F0016D351CABE2BE00DF38F9 /* ZLPhotoPickerImageView.m */; };
 		F0016D531CABE2BE00DF38F9 /* ZLPhotoLib.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F0016D371CABE2BE00DF38F9 /* ZLPhotoLib.bundle */; };
+		F0EDDB3C1CAE07B1001A876A /* SHMemorialModel.m in Sources */ = {isa = PBXBuildFile; fileRef = F0EDDB3B1CAE07B1001A876A /* SHMemorialModel.m */; };
 		F0FD5BF21CACB6FE0084F4C0 /* SHHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = F0FD5BF11CACB6FE0084F4C0 /* SHHeaderView.m */; };
+		F0FD5C341CACF5930084F4C0 /* SHMemorialTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F0FD5C331CACF5930084F4C0 /* SHMemorialTableViewCell.m */; };
+		F0FD5C9C1CAD1D9A0084F4C0 /* SHAddMemorialTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F0FD5C9B1CAD1D9A0084F4C0 /* SHAddMemorialTableViewController.m */; };
+		F0FD5CA01CAD1EE70084F4C0 /* SHAddMemorialTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F0FD5C9E1CAD1EE70084F4C0 /* SHAddMemorialTableViewCell.m */; };
+		F0FD5CA11CAD1EE70084F4C0 /* SHAddMemorialTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F0FD5C9F1CAD1EE70084F4C0 /* SHAddMemorialTableViewCell.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -438,8 +443,17 @@
 		F0016D351CABE2BE00DF38F9 /* ZLPhotoPickerImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZLPhotoPickerImageView.m; sourceTree = "<group>"; };
 		F0016D361CABE2BE00DF38F9 /* ZLPhotoPickerCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZLPhotoPickerCommon.h; sourceTree = "<group>"; };
 		F0016D371CABE2BE00DF38F9 /* ZLPhotoLib.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = ZLPhotoLib.bundle; sourceTree = "<group>"; };
+		F0EDDB3A1CAE07B1001A876A /* SHMemorialModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHMemorialModel.h; sourceTree = "<group>"; };
+		F0EDDB3B1CAE07B1001A876A /* SHMemorialModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SHMemorialModel.m; sourceTree = "<group>"; };
 		F0FD5BF01CACB6FE0084F4C0 /* SHHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHHeaderView.h; sourceTree = "<group>"; };
 		F0FD5BF11CACB6FE0084F4C0 /* SHHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SHHeaderView.m; sourceTree = "<group>"; };
+		F0FD5C321CACF5930084F4C0 /* SHMemorialTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHMemorialTableViewCell.h; sourceTree = "<group>"; };
+		F0FD5C331CACF5930084F4C0 /* SHMemorialTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SHMemorialTableViewCell.m; sourceTree = "<group>"; };
+		F0FD5C9A1CAD1D9A0084F4C0 /* SHAddMemorialTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHAddMemorialTableViewController.h; sourceTree = "<group>"; };
+		F0FD5C9B1CAD1D9A0084F4C0 /* SHAddMemorialTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SHAddMemorialTableViewController.m; sourceTree = "<group>"; };
+		F0FD5C9D1CAD1EE70084F4C0 /* SHAddMemorialTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHAddMemorialTableViewCell.h; sourceTree = "<group>"; };
+		F0FD5C9E1CAD1EE70084F4C0 /* SHAddMemorialTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SHAddMemorialTableViewCell.m; sourceTree = "<group>"; };
+		F0FD5C9F1CAD1EE70084F4C0 /* SHAddMemorialTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SHAddMemorialTableViewCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -879,6 +893,8 @@
 			children = (
 				04EF90431CA4CBB700DCE9E2 /* SHMemorialTableViewController.h */,
 				04EF90441CA4CBB700DCE9E2 /* SHMemorialTableViewController.m */,
+				F0FD5C9A1CAD1D9A0084F4C0 /* SHAddMemorialTableViewController.h */,
+				F0FD5C9B1CAD1D9A0084F4C0 /* SHAddMemorialTableViewController.m */,
 			);
 			path = MemorialVC;
 			sourceTree = "<group>";
@@ -897,6 +913,8 @@
 			children = (
 				04EF90491CA4CBB700DCE9E2 /* SHAccountHome.h */,
 				04EF904A1CA4CBB700DCE9E2 /* SHAccountHome.m */,
+				F0EDDB3A1CAE07B1001A876A /* SHMemorialModel.h */,
+				F0EDDB3B1CAE07B1001A876A /* SHMemorialModel.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1326,6 +1344,11 @@
 			children = (
 				F0FD5BF01CACB6FE0084F4C0 /* SHHeaderView.h */,
 				F0FD5BF11CACB6FE0084F4C0 /* SHHeaderView.m */,
+				F0FD5C321CACF5930084F4C0 /* SHMemorialTableViewCell.h */,
+				F0FD5C331CACF5930084F4C0 /* SHMemorialTableViewCell.m */,
+				F0FD5C9D1CAD1EE70084F4C0 /* SHAddMemorialTableViewCell.h */,
+				F0FD5C9E1CAD1EE70084F4C0 /* SHAddMemorialTableViewCell.m */,
+				F0FD5C9F1CAD1EE70084F4C0 /* SHAddMemorialTableViewCell.xib */,
 			);
 			path = MemorialView;
 			sourceTree = "<group>";
@@ -1476,6 +1499,7 @@
 				C24F97871CAE5CBE00479FED /* image2.png in Resources */,
 				04EF90FD1CA4D4C200DCE9E2 /* sweetTime.plist in Resources */,
 				04EF90E81CA4D4C200DCE9E2 /* bier.png in Resources */,
+				F0FD5CA11CAD1EE70084F4C0 /* SHAddMemorialTableViewCell.xib in Resources */,
 				C21FA2AA1CABD18B0014FA18 /* image1.png in Resources */,
 				C24F978D1CAE790300479FED /* image0.png in Resources */,
 				04EF90E91CA4D4C200DCE9E2 /* cutfruit.png in Resources */,
@@ -1566,6 +1590,7 @@
 				04EF90E41CA4D4C200DCE9E2 /* UIView+ViewFrameExt.m in Sources */,
 				048EF3B51C9F841700F4C823 /* CYRegistViewController.m in Sources */,
 				F0016D4A1CABE2BE00DF38F9 /* ZLNavigationController.m in Sources */,
+				F0FD5CA01CAD1EE70084F4C0 /* SHAddMemorialTableViewCell.m in Sources */,
 				0454DC8F1CA22B3800CBF346 /* CYAccount.m in Sources */,
 				040A4E0E1CA3EB1C00575188 /* CYAccountTool.m in Sources */,
 				04EF90951CA4CBC100DCE9E2 /* SHSheViewController.m in Sources */,
@@ -1584,6 +1609,7 @@
 				F0016D4D1CABE2BE00DF38F9 /* ZLPhotoPickerViewController.m in Sources */,
 				04FD143F1CA23AAA00CDB91E /* NSObject+CYNetWork.m in Sources */,
 				041124D71C9D43D4001B7DD2 /* CYAppDelegate.m in Sources */,
+				F0FD5C341CACF5930084F4C0 /* SHMemorialTableViewCell.m in Sources */,
 				C26583CD1CA66FB200B76914 /* SHPhotoCollectionViewCell.m in Sources */,
 				04EF910E1CA4E5A300DCE9E2 /* CYTabBar.m in Sources */,
 				04EF910F1CA4E5A300DCE9E2 /* CYTabBarButton.m in Sources */,
@@ -1636,6 +1662,7 @@
 				F0016D471CABE2BE00DF38F9 /* ZLPhotoPickerDatas.m in Sources */,
 				04EF906F1CA4CBB700DCE9E2 /* SHExtensionViewController.m in Sources */,
 				04EF90751CA4CBB700DCE9E2 /* SHIconView.m in Sources */,
+				F0EDDB3C1CAE07B1001A876A /* SHMemorialModel.m in Sources */,
 				F0FD5BF21CACB6FE0084F4C0 /* SHHeaderView.m in Sources */,
 				04FD14451CA240EE00CDB91E /* CYVerificationView.m in Sources */,
 				F0016D431CABE2BE00DF38F9 /* ZLPhotoPickerBrowserPhotoScrollView.m in Sources */,
@@ -1657,6 +1684,7 @@
 				04EF90901CA4CBC100DCE9E2 /* SHAboutusViewController.m in Sources */,
 				04B682261C9D4C0D003B52D7 /* UIView+CYFrame.m in Sources */,
 				04FD144B1CA2536600CDB91E /* CYLoginView.m in Sources */,
+				F0FD5C9C1CAD1D9A0084F4C0 /* SHAddMemorialTableViewController.m in Sources */,
 				F0016D411CABE2BE00DF38F9 /* ZLPhotoPickerBrowserViewController.m in Sources */,
 				F0016D461CABE2BE00DF38F9 /* ZLPhotoAssets.m in Sources */,
 				041124DF1C9D472A001B7DD2 /* CYTabBarController.m in Sources */,

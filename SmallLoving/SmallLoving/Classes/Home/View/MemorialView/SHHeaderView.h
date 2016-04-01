@@ -11,6 +11,7 @@
 @interface SHHeaderView : UIView
 @property(nonatomic, strong)UIImageView *heartImageView;
 @property(nonatomic, strong)UILabel *leftTopLabel;
-@property(nonatomic, strong)UILabel *leftBottonLabel;
 @property(nonatomic, strong)UILabel *rightLable;
+
+- (void)setupHeaderViewLabelWithLoveDate:(NSDate *)date;
 @end

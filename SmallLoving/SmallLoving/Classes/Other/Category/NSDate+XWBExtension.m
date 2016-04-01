@@ -44,4 +44,37 @@
     NSString *nowStr = [fmt stringFromDate:now];
     return [dateStr isEqualToString:nowStr];
 }
+
+//计算今天距离纪念日还有几天
+- (NSString *)getDaySinceMemorial{
+    //获取日期
+    NSDate *nowDate = [NSDate date];
+    NSDateFormatter *formatter =[[NSDateFormatter alloc] init];
+    formatter.dateFormat = @"yyyy-MM-dd";
+    NSString *timestamp = [formatter stringFromDate:self];
+    timestamp = [timestamp substringFromIndex:5];
+    NSString *nowDateStr = [formatter stringFromDate:nowDate];
+    nowDateStr = [nowDateStr substringToIndex:4];
+    NSString *timeDateYear = [NSString stringWithFormat:@"%@-%@",nowDateStr,timestamp];
+    NSDate *date = [formatter dateFromString:timeDateYear];
+    NSLog(@"%@",date);
+    //日历对象(方便比较两个日期之间的差距)
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    //NSCalendarUnit枚举代想获得哪些差值
+    NSCalendarUnit unit = NSCalendarUnitDay;
+    //计算两个日期之间的差值
+    NSDateComponents *cmps = [calendar components:unit fromDate:nowDate toDate:date options:0];
+    if (cmps.day >= 0) {
+        return [NSString stringWithFormat:@"%ld",(long)cmps.day];
+    }else{
+        NSString *yearStr = [nowDateStr substringFromIndex:3];
+        nowDateStr = [nowDateStr substringToIndex:3];
+        nowDateStr = [NSString stringWithFormat:@"%@%d",nowDateStr,yearStr.intValue + 1];
+        timeDateYear = [NSString stringWithFormat:@"%@-%@",nowDateStr,timestamp];
+        NSDate *date = [formatter dateFromString:timeDateYear];
+        NSLog(@"%@",date);
+        cmps = [calendar components:unit fromDate:nowDate toDate:date options:0];
+        return [NSString stringWithFormat:@"%ld",cmps.day];
+    }
+}
 @end
