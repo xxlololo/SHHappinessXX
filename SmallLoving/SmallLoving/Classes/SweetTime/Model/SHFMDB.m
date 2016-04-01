@@ -74,4 +74,12 @@
 - (void)delete{
    [self.queue executeQuery:@"delete from t_spacemood"];
 }
+//删除某一行
+- (void)deleteWithTitle:(NSString *)titleStr context:(NSString *)contextStr{
+    if ([self.queue open]) {
+        [self.queue executeQuery:@"delete from t_spacemood where titletext='%@',contenttext='%@';",titleStr,contextStr];
+    }
+    
+}
+
 @end

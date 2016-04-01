@@ -14,4 +14,9 @@
 @property (nonatomic,strong)UITextView *textView;
 @property (nonatomic,strong)UILabel *textLabel;
 @property (nonatomic,strong)UILabel *placeholderLabel;
+
+//图片布局
+@property (nonatomic,strong)UITextView *textV;
+@property (nonatomic,strong)UILabel *promptTitle;
+
 @end
