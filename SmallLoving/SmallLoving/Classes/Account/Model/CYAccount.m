@@ -11,6 +11,22 @@
 
 @implementation CYAccount
 
+@dynamic userName;
+@dynamic number;
+@dynamic password;
+@dynamic mail;
+@dynamic iconURL;
+@dynamic otherUserName;
+@dynamic sex;
+@dynamic latitude;
+@dynamic longitude;
+
+
++ (NSString *)parseClassName {
+    return @"CYAccount";
+}
+
+
 - (instancetype)initWithCoder:(NSCoder *)coder {
     self = [super init];
     if (self) {

@@ -11,7 +11,9 @@
 #import "SHIconView.h"
 #import "SHAccountHome.h"
 #import "SHAccountTool.h"
-
+#import "CYAccount.h"
+#import <MJExtension.h>
+#import "CYAccountTool.h"
 
 @interface SHSexViewController ()
 @property (nonatomic, strong) SHSexView * sexView;
@@ -32,8 +34,8 @@
     [self.sexView.womanIconView.iconBtn addTarget:self action:@selector(womanIconBtnAction:) forControlEvents:UIControlEventTouchUpInside];
     
     //获取账户信息
-    SHAccountHome *accountHome = [SHAccountTool account];
-    if ([accountHome.sex isEqualToString:@"f"]) {
+    CYAccount *cyAccount = [CYAccountTool account];
+    if ([cyAccount.sex isEqualToString:@"f"]) {
         self.sexView.womanIconView.selectedImageView.hidden = NO;
     }else{
         self.sexView.manIconView.selectedImageView.hidden = NO;
@@ -70,19 +72,33 @@
     }else if (!self.sexView.womanIconView.selectedImageView.hidden){
         genderStr = @"f";
     }
-    //获取账户信息
-    SHAccountHome *accountHome = [SHAccountTool account];
-    accountHome.sex = genderStr;
-    //存储到沙盒
-    [SHAccountTool saveAccount:accountHome];
+
     if ([genderStr isEqualToString:@"m"] || [genderStr isEqualToString:@"f"]) {
         CYAlertController *alertVC = [CYAlertController showAlertControllerWithTitle:@"提示" message:@"性别修改成功" preferredStyle:UIAlertControllerStyleActionSheet isSucceed:YES viewController:self];
         CYAlertAction *actionCamera = [CYAlertAction actionWithTitle:@"确定" handler:^(UIAlertAction *action) {
-            if ([genderStr isEqualToString:@"m"]) {
-            [self.navigationController popViewControllerAnimated:YES];
-            }else{
-            [self.navigationController popViewControllerAnimated:YES];
-            }
+            //获取账户信息
+            CYAccount *cyAccount = [CYAccountTool account];
+            cyAccount.sex = genderStr;
+            //存储到沙盒
+            //上传到云端
+            [CYAccountTool saveAccount:cyAccount];
+            //上传到云端
+            AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"CYAccount" objectId:cyAccount.objectId];
+            [accountAV setObject:cyAccount.sex forKey:@"sex"];
+            __weak typeof(self) weakSelf = self;
+            [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    //存储到本地
+                    CYLog(@"存储性别成功");
+                    [CYAccountTool saveAccount:cyAccount];
+                    if ([genderStr isEqualToString:@"m"]) {
+                        [weakSelf.navigationController popViewControllerAnimated:YES];
+                    }else{
+                        [weakSelf.navigationController popViewControllerAnimated:YES];
+                    }
+                }
+            }];
+
         }];
         alertVC.allActions = @[actionCamera];
     }

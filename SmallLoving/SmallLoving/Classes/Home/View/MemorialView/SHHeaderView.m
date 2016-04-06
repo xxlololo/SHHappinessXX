@@ -61,7 +61,6 @@
         make.centerY.equalTo(self);
         make.right.equalTo(self).offset(-20);
     }];
-    
 }
 
 - (void)setupHeaderViewLabelWithLoveDate:(NSDate *)date{

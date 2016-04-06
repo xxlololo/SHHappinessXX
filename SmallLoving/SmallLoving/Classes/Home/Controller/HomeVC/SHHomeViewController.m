@@ -12,7 +12,12 @@
 #import "SHCoverImageView.h"
 #import "SHExtensionViewController.h"
 #import "SHAccountTool.h"
-#import "SHAccountHome.h"
+#import "SHMemorialModel.h"
+#import <UIImageView+WebCache.h>
+#import "SHImageTool.h"
+#import "CYAccountTool.h"
+#import "CYAccount.h"
+#import <MJExtension.h>
 
 @interface SHHomeViewController ()<UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 @property(nonatomic, strong)SHHomeScrollView *homeScrollView;
@@ -54,10 +59,17 @@ const CGFloat kStatusBarHeight = 20;
     
     //获取账户信息
     SHAccountHome *accountHome = [SHAccountTool account];
-    if (accountHome.coverImage) {
-        self.homeScrollView.coverImageView.image = accountHome.coverImage;
+    SHImageModel *imageModel = [SHImageTool imageModel];
+    if (imageModel.coverImage) {
+        self.homeScrollView.coverImageView.image = imageModel.coverImage;
     }else{
-        self.homeScrollView.coverImageView.image = [UIImage imageNamed:@"9302B515F05E3A5492878E82F5D69EEA"];
+        if (accountHome.coverImageUrl) {
+            [self.homeScrollView.coverImageView sd_setImageWithURL:[NSURL URLWithString:accountHome.coverImageUrl] placeholderImage:[UIImage imageNamed:@"9302B515F05E3A5492878E82F5D69EEA"]];
+            imageModel.coverImage = self.homeScrollView.coverImageView.image;
+            [SHImageTool saveImageModel:imageModel];
+        }else{
+            self.homeScrollView.coverImageView.image = [UIImage imageNamed:@"9302B515F05E3A5492878E82F5D69EEA"];
+        }
     }
 
     self.accountHome = accountHome;
@@ -69,6 +81,16 @@ const CGFloat kStatusBarHeight = 20;
     //获取账户信息
     SHAccountHome *accountHome = [SHAccountTool account];
     self.accountHome = accountHome;
+    long day = 0;
+    if (accountHome.memorialArray) {
+        NSDateFormatter *formatter =[[NSDateFormatter alloc] init];
+        formatter.dateFormat = @"yyyy-MM-dd";
+
+        SHMemorialModel *memorialModel = accountHome.memorialArray[0];
+        NSTimeInterval timeInterval = [[NSDate date] timeIntervalSinceDate:[formatter dateFromString:memorialModel.memorialDate]];
+        day = (int)(timeInterval/86400);
+    }
+    [self.homeScrollView.coverImageView.loveTimeBtn setTitle:[NSString stringWithFormat:@"我们已相爱%ld天",day] forState:UIControlStateNormal];
 }
 
 - (void)viewDidAppear:(BOOL)animated{
@@ -77,28 +99,47 @@ const CGFloat kStatusBarHeight = 20;
 }
 
 - (void)loveTimeBtnClick:(UIButton *)loveTimeBtn{
-    NSLog(@"11111111");
+    
 }
 
 - (void)cameraBtnClick:(UIButton *)cameraBtn{
+    __weak typeof(self) weakSelf = self;
     CYAlertController *alertVC = [CYAlertController showAlertControllerWithTitle:@"上传合影" message:nil preferredStyle:UIAlertControllerStyleActionSheet isSucceed:YES viewController:self];
     // 添加事件
     //拍照
     CYAlertAction *actionCamera = [CYAlertAction actionWithTitle:@"拍照" handler:^(UIAlertAction *action) {
-        [self openCamera];
+        [weakSelf openCamera];
     }];
     
     //从相册上传
     CYAlertAction *actionAlbum = [CYAlertAction actionWithTitle:@"从相册上传" handler:^(UIAlertAction *action) {
-        [self openAlbum];
+        [weakSelf openAlbum];
     }];
     
     //恢复默认
     CYAlertAction *actionDefault = [CYAlertAction actionWithTitle:@"恢复默认" handler:^(UIAlertAction *action) {
-        self.homeScrollView.coverImageView.image = [UIImage imageNamed:@"9302B515F05E3A5492878E82F5D69EEA"];
-        self.accountHome.coverImage = self.homeScrollView.coverImageView.image;
+        weakSelf.homeScrollView.coverImageView.image = [UIImage imageNamed:@"9302B515F05E3A5492878E82F5D69EEA"];
+        weakSelf.accountHome.coverImageUrl = nil;
+        SHImageModel *imageMode = [SHImageTool imageModel];
+        imageMode.coverImage = nil;
+        [SHImageTool saveImageModel:imageMode];
+        
         //存储到沙盒
-        [SHAccountTool saveAccount:self.accountHome];
+        CYAccount *cyAccount = [CYAccountTool account];
+        //上传到云端
+        if (cyAccount.accountHomeObjID) {
+            AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"SHAccountHome" objectId:cyAccount.accountHomeObjID];
+            [accountAV setObject:weakSelf.accountHome.mj_keyValues forKey:@"accountHome"];
+            [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    //存储到本地
+                    CYLog(@"存储封面成功");
+                    //存储到沙盒
+                    [SHAccountTool saveAccount:weakSelf.accountHome];
+                }
+            }];
+        }
+        [SHAccountTool saveAccount:weakSelf.accountHome];
     }];
     alertVC.allActions = @[actionCamera,actionAlbum,actionDefault];
 }
@@ -155,9 +196,35 @@ const CGFloat kStatusBarHeight = 20;
     UIImage *image = info[UIImagePickerControllerOriginalImage];
     //添加图片到photosView中
     self.homeScrollView.coverImageView.image = image;
-    self.accountHome.coverImage = image;
-    //存储到沙盒
-    [SHAccountTool saveAccount:self.accountHome];
+    
+    //存储图片在本地沙盒中
+    SHImageModel *imageModel = [SHImageTool imageModel];
+    imageModel.coverImage = image;
+    CYAccount *cyAccount = [CYAccountTool account];
+    __weak typeof(self) weakSelf = self;
+    //保存到沙盒上传到云端
+    if (cyAccount.accountHomeObjID) {
+        NSData *imageData = UIImagePNGRepresentation(image);
+        AVFile *file = [AVFile fileWithName:@"coverImage.png" data:imageData];
+        [file saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+            if (succeeded) {
+                weakSelf.accountHome.coverImageUrl = file.url;
+            //上传到云端
+                AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"SHAccountHome" objectId:cyAccount.accountHomeObjID];
+                [accountAV setObject:weakSelf.accountHome.mj_keyValues forKey:@"accountHome"];
+                [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                    if (succeeded) {
+                        //存储到本地
+                        CYLog(@"存储封面图片成功");
+                        [SHImageTool saveImageModel:imageModel];
+                        [SHAccountTool saveAccount:weakSelf.accountHome];
+                    }
+                }];
+        }
+    }];
+    }
+    [SHImageTool saveImageModel:imageModel];
+    [SHAccountTool saveAccount:weakSelf.accountHome];
 }
 
 

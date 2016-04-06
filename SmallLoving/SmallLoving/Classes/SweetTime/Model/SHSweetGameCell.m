@@ -10,15 +10,6 @@
 
 @implementation SHSweetGameCell
 
-- (void)choseTerm:(UIButton *)button{
-    
-    
-    
-}
-- (IBAction)BTNAction:(UIButton *)sender
-{
-    
-}
 
 
 @end

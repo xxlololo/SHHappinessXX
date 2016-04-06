@@ -16,6 +16,8 @@
 #import "CYTabBarButton.h"
 #import "CYTabBar.h"
 #import <CDChatManager.h>
+#import "CYAccount.h"
+#import "CYAccountTool.h"
 
 @interface CYTabBarController ()
 
@@ -52,7 +54,7 @@
     SHProfileViewController * profileVC = [[SHProfileViewController alloc]init];
     _profileVC = profileVC;
     // 添加控制器
-    [self addOneChildViewController:smallLovingVC image:[UIImage imageWithOriginalName:@"tab-bar-home-icon-normal"] selectedImage:[UIImage imageWithOriginalName:@"tab-bar-home-icon-selected"] title:@"小恩爱"];
+    [self addOneChildViewController:smallLovingVC image:[UIImage imageWithOriginalName:@"tab-bar-home-icon-normal"] selectedImage:[UIImage imageWithOriginalName:@"tab-bar-home-icon-selected"] title:@"小幸福"];
     [self addOneChildViewController:discoverVC image:[UIImage imageWithOriginalName:@"tab-bar-discovery-icon-normal"] selectedImage:[UIImage imageWithOriginalName:@"tab-bar-discovery-icon-selected"] title:@"发现"];
     [((CYTabBar *)self.tabBar).barBtn addTarget:self action:@selector(chatAction) forControlEvents:(UIControlEventTouchUpInside)];
     [self addOneChildViewController:notificationVC image:[UIImage imageWithOriginalName:@"tab-bar-notification-icon-normal"] selectedImage:[UIImage imageWithOriginalName:@"tab-bar-notification-icon-selected"] title:@"通知"];
@@ -72,13 +74,25 @@
 }
 
 - (void)chatAction {
-    [[CDChatManager manager]openWithClientId:@"Tom" callback:^(BOOL succeeded, NSError *error) {
-        [[CDChatManager manager]fetchConversationWithOtherId:@"Jerry" callback:^(AVIMConversation *conversation, NSError *error) {
-            CDChatViewController *chat = [[CDChatViewController alloc] initWithConversation:conversation];
-            CYNavigationController * nav = [[CYNavigationController alloc]initWithRootViewController:chat];
-            [self presentViewController:nav animated:YES completion:nil];
-    }];
-    }];
+    CYAccount *cyAccount = [CYAccountTool account];
+    if (cyAccount.otherUserName) {
+        [[CDChatManager manager]openWithClientId:cyAccount.userName callback:^(BOOL succeeded, NSError *error) {
+            [[CDChatManager manager]fetchConversationWithOtherId:cyAccount.otherUserName callback:^(AVIMConversation *conversation, NSError *error) {
+                CDChatViewController *chat = [[CDChatViewController alloc] initWithConversation:conversation];
+                CYNavigationController * nav = [[CYNavigationController alloc]initWithRootViewController:chat];
+                [self presentViewController:nav animated:YES completion:nil];
+        }];
+        }];
+    }else{
+        UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:nil message:@"还没有设置另一半" preferredStyle:UIAlertControllerStyleActionSheet];
+        
+        UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            
+        }];
+        [alertVC addAction:confirm];
+        [self presentViewController:alertVC animated:YES completion:nil];
+    }
+    
 }
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

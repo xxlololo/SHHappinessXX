@@ -15,4 +15,6 @@
 
 //返回账号信息 如果账号过期 返回nil
 + (SHAccountHome *)account;
+//删除首页类
++ (void)removeAccountHome;
 @end

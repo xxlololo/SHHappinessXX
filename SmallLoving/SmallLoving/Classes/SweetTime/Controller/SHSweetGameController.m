@@ -79,7 +79,7 @@
 -(void)beginBtnAction:(UIButton *)btn
 {
     
-    NSLog(@"MyRow:%ld",[self.tableView indexPathForCell:((SHSweetGameCell *)[[btn superview]superview])].row);
+//    NSLog(@"MyRow:%ld",[self.tableView indexPathForCell:((SHSweetGameCell *)[[btn superview]superview])].row);
     SHWebGameController *webGame = [[SHWebGameController alloc]init];
     self.dic = self.dataArr[[self.tableView indexPathForCell:((SHSweetGameCell *)[[btn   superview]superview])].section][[self.tableView indexPathForCell:((SHSweetGameCell *)[[btn   superview]superview])].row];
     webGame.urlStr = self.dic[@"url"];

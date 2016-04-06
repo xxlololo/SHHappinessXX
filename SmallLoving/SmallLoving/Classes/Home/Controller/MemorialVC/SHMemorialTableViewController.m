@@ -44,7 +44,10 @@
     SHAccountHome *account = [SHAccountTool account];
     if (account.memorialArray) {
         SHMemorialModel *memorialModel = account.memorialArray[0];
-        [self.headerView setupHeaderViewLabelWithLoveDate:memorialModel.memorialDate];
+        NSDateFormatter *formatter =[[NSDateFormatter alloc] init];
+        formatter.dateFormat = @"yyyy-MM-dd";
+
+        [self.headerView setupHeaderViewLabelWithLoveDate:[formatter dateFromString:memorialModel.memorialDate]];
     }
     [window addSubview:self.headerView];
     [self.tableView reloadData];
@@ -96,6 +99,9 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     SHMemorialTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
     SHAccountHome *account = [SHAccountTool account];
+    NSDateFormatter *formatter =[[NSDateFormatter alloc] init];
+    formatter.dateFormat = @"yyyy-MM-dd";
+
     if (indexPath.row == 0) {
         UIImage *backgroundImage = [UIImage imageNamed:@"extension-anniversary-cell-bg-pink"];
         CGFloat top = 10; // 顶端盖高度
@@ -110,7 +116,7 @@
         cell.memorialNameLabel.text = @"我们已相爱";
         NSDate *date = [NSDate date];
         SHMemorialModel *memorialModel = account.memorialArray[0];
-        NSTimeInterval timeInterval = [date timeIntervalSinceDate:memorialModel.memorialDate];
+        NSTimeInterval timeInterval = [date timeIntervalSinceDate:[formatter dateFromString:memorialModel.memorialDate]];
         cell.dayLabel.text = [NSString stringWithFormat:@"%d",(int)(timeInterval/86400)];
     }else{
         UIImage *backgroundImage = [UIImage imageNamed:@"extension-anniversary-cell-bg-blue"];
@@ -125,7 +131,8 @@
         cell.leftImageView.image = [UIImage imageNamed:@"extension_anniversary-timeline-icon-normal"];
         SHMemorialModel *memorialModel = account.memorialArray[indexPath.row];
         cell.memorialNameLabel.text = [NSString stringWithFormat:@"距离%@还有",memorialModel.memorialName];
-        cell.dayLabel.text = [memorialModel.memorialDate getDaySinceMemorial];
+        
+        cell.dayLabel.text = [[formatter dateFromString:memorialModel.memorialDate] getDaySinceMemorial];
     }
     return cell;
 }

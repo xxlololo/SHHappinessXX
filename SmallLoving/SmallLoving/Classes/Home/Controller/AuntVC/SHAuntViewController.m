@@ -11,6 +11,9 @@
 #import "SHMenstruationTableViewController.h"
 #import "SHAuntIsComing.h"
 #import "SHAccountTool.h"
+#import "CYAccount.h"
+#import "CYAccountTool.h"
+#import <MJExtension.h>
 
 @interface SHAuntViewController ()
 @property (nonatomic, strong) SHAuntIsComing * auntIsComingView;
@@ -25,8 +28,8 @@
     [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(timeChangeAction) userInfo:nil repeats:YES];
     //设置性别视图
     //获取账户信息
-    SHAccountHome *accountHome = [SHAccountTool account];
-    if (accountHome.sex == nil) {
+    CYAccount *cyAccount = [CYAccountTool account];
+    if (cyAccount.sex == nil) {
         SHSexViewController *sexVC = [[SHSexViewController alloc] init];
         [self.navigationController pushViewController:sexVC animated:YES];
     }
@@ -41,8 +44,9 @@
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     //获取账户信息
+    CYAccount *cyAccount = [CYAccountTool account];
     SHAccountHome *accountHome = [SHAccountTool account];
-    if (accountHome.sex) {
+    if (cyAccount.sex) {
         //设置界面内容
         [self.auntIsComingView setupViewWithAccountHome:accountHome];
     }
@@ -78,10 +82,28 @@
             accountHome.isMenstruation = @"NO";
         }else{
             accountHome.isMenstruation = @"YES";
-            accountHome.lastAuntDate = [NSDate date];
+            NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
+            //设置日期格式(声明字符串里面每个数字和单词的含义)
+            fmt.dateFormat = @"yyyy-MM-dd";
+            accountHome.lastAuntDate = [fmt stringFromDate:[NSDate date]];
         }
         //存储到沙盒
+        CYAccount *cyAccount = [CYAccountTool account];
+        //上传到云端
+        if (cyAccount.accountHomeObjID) {
+            AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"SHAccountHome" objectId:cyAccount.accountHomeObjID];
+            [accountAV setObject:accountHome.mj_keyValues forKey:@"accountHome"];
+            [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    //存储到本地
+                    CYLog(@"存储是否正在姨妈期成功");
+                    //存储到沙盒
+                    [SHAccountTool saveAccount:accountHome];
+                }
+            }];
+        }
         [SHAccountTool saveAccount:accountHome];
+
         SHAuntIsComing *auntIsComingView = [[SHAuntIsComing alloc] initWithFrame:self.view.bounds];
         [auntIsComingView.womanBtn addTarget:self action:@selector(womanBtnAction:) forControlEvents:UIControlEventTouchUpInside];
         [self.auntIsComingView removeFromSuperview];
@@ -99,11 +121,11 @@
 
 - (void)rightItemAction:(UIBarButtonItem *)rightItem{
     //获取账户信息
-    SHAccountHome *accountHome = [SHAccountTool account];
-    if ([accountHome.sex isEqualToString:@"m"]) {
+    CYAccount *cyAccount= [CYAccountTool account];
+    if ([cyAccount.sex isEqualToString:@"m"]) {
         SHSexViewController *sexVC = [[SHSexViewController alloc] init];
         [self.navigationController pushViewController:sexVC animated:YES];
-    }else if ([accountHome.sex isEqualToString:@"f"]) {
+    }else if ([cyAccount.sex isEqualToString:@"f"]) {
         SHMenstruationTableViewController *menstruationTVC = [[SHMenstruationTableViewController alloc] init];
         [self.navigationController pushViewController:menstruationTVC animated:YES];
     }
@@ -112,7 +134,7 @@
 - (void)timeChangeAction{
     //获取账户信息
     SHAccountHome *accountHome = [SHAccountTool account];
-    if ([accountHome.isMenstruation isEqualToString:@"NO"] || self.auntIsComingView.auntTowelFirstLabel.text) {
+    if (([accountHome.isMenstruation isEqualToString:@"NO"] || self.auntIsComingView.auntTowelFirstLabel.text) && accountHome.lastAuntDate && accountHome.interval) {
         [self.auntIsComingView setupAuntTowelSecondLabelWithAccountHome:accountHome];
     }
 }

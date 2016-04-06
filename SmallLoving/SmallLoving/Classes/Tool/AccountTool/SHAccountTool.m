@@ -7,7 +7,6 @@
 //
 
 #import "SHAccountTool.h"
-#import "SHAccountHome.h"
 
 //账号存储路径 沙盒路径
 #define SHAccountPath [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"account.archive"]
@@ -25,6 +24,11 @@
         account = [[SHAccountHome alloc] init];
     }
     return account;
+}
+
+//删除首页类
++ (void)removeAccountHome{
+    [[NSFileManager defaultManager]removeItemAtPath:SHAccountPath error:nil];
 }
 
 

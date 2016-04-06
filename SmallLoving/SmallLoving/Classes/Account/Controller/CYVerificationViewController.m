@@ -8,9 +8,9 @@
 
 #import "CYVerificationViewController.h"
 #import "CYVerificationView.h"
-#import <AVOSCloud/AVOSCloud.h>
 #import "CYAccountTool.h"
 #import "CYAccount.h"
+#import "CYOtherAccountTool.h"
 
 @interface CYVerificationViewController ()
 
@@ -59,6 +59,12 @@
         if (succeeded) {
             // 存到本地
             [CYAccountTool saveAccount:self.account];
+            //存储到服务器
+            CYAccount *cyAccount = [CYAccount object];
+            cyAccount.userName = self.account.userName;
+            cyAccount.password = self.account.password;
+            [cyAccount saveInBackground];
+
             [self dismissViewControllerAnimated:YES completion:nil];
         } else {
             UIAlertController * defAlertVC = [UIAlertController alertControllerWithTitle:@"失败" message:@"验证码错误, 请重试" preferredStyle:(UIAlertControllerStyleActionSheet)];

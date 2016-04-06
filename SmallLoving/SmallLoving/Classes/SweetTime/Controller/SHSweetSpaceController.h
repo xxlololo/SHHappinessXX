@@ -9,11 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface SHSweetSpaceController : UITableViewController
-@property (nonatomic,assign) CGFloat num;
-@property (nonatomic,assign)CGFloat cellHeigh;
-@property (nonatomic,strong)NSString  *titleCopy;
-@property (nonatomic,strong)NSString *textCopy;
-@property (nonatomic,strong)NSMutableArray *pictureArr;
 //顶部视图 图片
 @property (nonatomic, strong) UIImageView *headerImageView;
 @property (nonatomic, strong) UIView *headerContentView;

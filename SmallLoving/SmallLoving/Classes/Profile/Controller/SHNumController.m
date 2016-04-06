@@ -21,7 +21,7 @@
         _buttonconserve = btn;
         [btn addTarget:self action:@selector(ConserveAction) forControlEvents:UIControlEventTouchUpInside];
         [btn setTitle:@"保存" forState:UIControlStateNormal];
-        [btn setBackgroundImage:[UIImage imageNamed:@"button1"] forState:(UIControlStateNormal)];
+        [btn setBackgroundImage:[UIImage imageNamed:@"forum-advert-download-btn"] forState:(UIControlStateNormal)];
         [self.view addSubview:btn];
     }
     return _buttonconserve;

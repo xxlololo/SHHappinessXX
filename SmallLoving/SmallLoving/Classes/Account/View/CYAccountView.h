@@ -13,17 +13,17 @@
 /**
  *  QQ 登录按钮
  */
-@property (nonatomic, weak) UIButton * qqLoginBtn;
+//@property (nonatomic, weak) UIButton * qqLoginBtn;
 
 /**
  *  微信登录按钮
  */
-@property (nonatomic, weak) UIButton * weChatLoginBtn;
+//@property (nonatomic, weak) UIButton * weChatLoginBtn;
 
 /**
  *  微博登录按钮
  */
-@property (nonatomic, weak) UIButton * weiBoLoginBtn;
+//@property (nonatomic, weak) UIButton * weiBoLoginBtn;
 
 /**
  *  登录按钮

@@ -17,5 +17,5 @@
 @property(nonatomic, strong)UILabel *sleepTimeLabel;
 @property(nonatomic, strong)SHSleepingView *sleepingView;
 
-- (NSString *)createdSinceNowWithDate:(NSDate *)date;
+- (NSString *)createdSinceNowWithDate:(NSString *)date;
 @end

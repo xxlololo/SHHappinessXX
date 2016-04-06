@@ -64,10 +64,12 @@ static NSInteger const kOnePageSize = 10;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     self.view.backgroundColor = [UIColor whiteColor];
     [self initBarButton];
     [self initBottomMenuAndEmotionView];
     [self.view addSubview:self.clientStatusView];
+    self.automaticallyAdjustsScrollViewInsets = NO;
     // 设置自身用户名
     id<CDUserModelDelegate> selfUser = [[CDChatManager manager].userDelegate getUserById:[CDChatManager manager].clientId];
     self.messageSender = [selfUser username];
@@ -79,6 +81,8 @@ static NSInteger const kOnePageSize = 10;
     [self refreshConv];
     [self loadMessagesWhenInit];
     [self updateStatusView];
+    
+    
 }
 
 - (void)viewDidAppear:(BOOL)animated {

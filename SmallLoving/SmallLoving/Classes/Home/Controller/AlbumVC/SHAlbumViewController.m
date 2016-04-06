@@ -11,6 +11,11 @@
 #import "SHAccountTool.h"
 #import "SHAlbumToolBarView.h"
 #import "ZLPhotoPickerBrowserViewController.h"
+#import "SHImageTool.h"
+#import "CYAccountTool.h"
+#import "CYAccount.h"
+#import <MJExtension.h>
+#import <UIImageView+WebCache.h>
 
 
 #define kWAndH ([UIScreen mainScreen].bounds.size.width - 25) / 4
@@ -46,10 +51,12 @@
 
 //设置视图
 - (void)setupContentView{
-    //获取账户信息
-    SHAccountHome *accountHome = [SHAccountTool account];
+    //获取照片
+    SHImageModel *imageModel = [SHImageTool imageModel];
+    
     //添加图片到photoArray中
-    self.photoArr = [NSMutableArray arrayWithArray:accountHome.photoArray];
+    
+    self.photoArr = [NSMutableArray arrayWithArray:imageModel.photosArr];
     
     //1.创建对象
     //1.1先创建UICollectionViewFlowLayout对象
@@ -162,16 +169,39 @@
 - (void)deleteBtnAction:(UIButton *)sender{
     CYAlertController *alertVC = [CYAlertController showAlertControllerWithTitle:@"提示" message:@"确定删除" preferredStyle:UIAlertControllerStyleActionSheet isSucceed:YES viewController:self];
     CYAlertAction *actionYes = [CYAlertAction actionWithTitle:@"确定" handler:^(UIAlertAction *action) {
-        for (UIImage *image in self.selectPhotoArr) {
-            [self.photoArr removeObject:image];
-        }
-        [self.selectPhotoArr removeAllObjects];
-        [self.toolBarView.deleteBtn setEnabled:NO];
+        //获取图片model
+        SHImageModel *imageModel = [SHImageTool imageModel];
         //获取账户信息
         SHAccountHome *accountHome = [SHAccountTool account];
-        accountHome.photoArray = self.photoArr;
+        NSMutableArray *photoUrlArr = [NSMutableArray arrayWithArray:accountHome.photoUrlArray];
+        for (NSIndexPath *indexPath in self.selectPhotoArr) {
+            [photoUrlArr removeObjectAtIndex:indexPath.row];
+            [self.photoArr removeObjectAtIndex:indexPath.row];
+        }
+        accountHome.photoUrlArray = photoUrlArr;
+        [self.selectPhotoArr removeAllObjects];
+        [self.toolBarView.deleteBtn setEnabled:NO];
+        imageModel.photosArr = self.photoArr;
+        
+        CYAccount *cyAccount = [CYAccountTool account];
+        //上传到云端
+        if (cyAccount.accountHomeObjID) {
+            AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"SHAccountHome" objectId:cyAccount.accountHomeObjID];
+            [accountAV setObject:accountHome.mj_keyValues forKey:@"accountHome"];
+            [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    //存储到本地
+                    CYLog(@"存储相册图片成功");
+                    //存入沙盒
+                    [SHAccountTool saveAccount:accountHome];
+                    [SHImageTool saveImageModel:imageModel];
+                }
+            }];
+        }
         //存入沙盒
         [SHAccountTool saveAccount:accountHome];
+        [SHImageTool saveImageModel:imageModel];
+        
         [self.collectionView reloadData];
         if (self.photoArr.count == 0) {
             [self.toolBarView.deleteBtn setEnabled:NO];
@@ -220,19 +250,49 @@
     //    pickerVc.delegate = self;
     
     //     传值可以用代理，或者用block来接收，以下是block的传值
+    //获取账户信息
+    SHAccountHome *accountHome = [SHAccountTool account];
+    //获取图片model
+    SHImageModel *imageModel = [SHImageTool imageModel];
+    CYAccount *cyAccount = [CYAccountTool account];
+    NSMutableArray *photoUrlArr = [NSMutableArray arrayWithArray:accountHome.photoUrlArray];
     __weak typeof(self) weakSelf = self;
     pickerVc.callBack = ^(NSArray<ZLPhotoAssets *> *status){
         for (ZLPhotoAssets *photoAssets in status) {
 
             [weakSelf.photoArr addObject:photoAssets.originImage];
+            
+            //添加图片到photoArray中
+            imageModel.photosArr = weakSelf.photoArr;
+
+            //保存到沙盒上传到云端
+            if (cyAccount.accountHomeObjID) {
+                NSData *imageData = UIImagePNGRepresentation(photoAssets.originImage);
+                AVFile *file = [AVFile fileWithName:@"photoImage.png" data:imageData];
+                [file saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                    if (succeeded) {
+                        [photoUrlArr addObject:file.url];
+                        accountHome.photoUrlArray = photoUrlArr;
+                        //上传到云端
+                        AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"SHAccountHome" objectId:cyAccount.accountHomeObjID];
+                        [accountAV setObject:accountHome.mj_keyValues forKey:@"accountHome"];
+                        [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                            if (succeeded) {
+                                //存储到本地
+                                CYLog(@"存储相册图片成功");
+                                //存储到沙盒
+                                [SHAccountTool saveAccount:accountHome];
+                                [SHImageTool saveImageModel:imageModel];
+                            }
+                        }];
+                    }
+                    }
+                ];
+            }
         }
         [weakSelf.collectionView reloadData];
-        //获取账户信息
-        SHAccountHome *accountHome = [SHAccountTool account];
-        //添加图片到photoArray中
-        accountHome.photoArray = weakSelf.photoArr;
-        //存储到沙盒
         [SHAccountTool saveAccount:accountHome];
+        [SHImageTool saveImageModel:imageModel];
     };
 }
 
@@ -250,6 +310,7 @@
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     SHPhotoCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
+    
     UIImage *photoImage = self.photoArr[indexPath.row];
     cell.photoImageView.image = photoImage;
     if (self.cellState == NormalState) {
@@ -268,12 +329,12 @@
     UICollectionViewCell *cell = (UICollectionViewCell *)button.superview.superview;
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     
-    UIImage *image = self.photoArr[indexPath.row];
+//    UIImage *image = self.photoArr[indexPath.row];
 
     if (button.selected) {
-        [self.selectPhotoArr addObject:image];
+        [self.selectPhotoArr addObject:indexPath];
     }else{
-        [self.selectPhotoArr removeObject:image];
+        [self.selectPhotoArr removeObject:indexPath];
     }
 
     if (self.selectPhotoArr.count) {
@@ -313,10 +374,30 @@
         [self.photoArr removeObjectAtIndex:index];
         //获取账户信息
         SHAccountHome *accountHome = [SHAccountTool account];
-        //添加图片到photoArray中
-        accountHome.photoArray = self.photoArr;
-        //存储到沙盒
+        //删除图片到photoUrlArray中
+        [accountHome.photoUrlArray removeObjectAtIndex:index];
+        //获取图片model
+        SHImageModel *imageModel = [SHImageTool imageModel];
+        imageModel.photosArr = self.photoArr;
+        
+        CYAccount *cyAccount = [CYAccountTool account];
+        //上传到云端
+        if (cyAccount.accountHomeObjID) {
+            AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"SHAccountHome" objectId:cyAccount.accountHomeObjID];
+            [accountAV setObject:accountHome.mj_keyValues forKey:@"accountHome"];
+            [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    //存储到本地
+                    CYLog(@"存储相册图片成功");
+                    //存储到沙盒
+                    [SHAccountTool saveAccount:accountHome];
+                    [SHImageTool saveImageModel:imageModel];
+                }
+            }];
+        }
         [SHAccountTool saveAccount:accountHome];
+        [SHImageTool saveImageModel:imageModel];
+
         [self.collectionView reloadData];
     }
 }

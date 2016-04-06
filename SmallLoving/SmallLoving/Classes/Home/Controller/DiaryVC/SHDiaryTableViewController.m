@@ -7,8 +7,20 @@
 //
 
 #import "SHDiaryTableViewController.h"
+#import "SHWriteDiaryViewController.h"
+#import "SHDiaryTableViewCell.h"
+#import "SHAccountTool.h"
+#import "SHDiaryModel.h"
+#import "CYAccountTool.h"
+#import "CYAccount.h"
+#import "SHImageTool.h"
+#import <MJExtension.h>
+#import <UIImageView+WebCache.h>
+#import "CYOtherAccountTool.h"
 
 @interface SHDiaryTableViewController ()
+@property(nonatomic, strong)NSMutableDictionary *diaryDic;
+@property(nonatomic, strong)NSMutableArray *keyArray;
 
 @end
 
@@ -18,6 +30,22 @@
     [super viewDidLoad];
     [self setNavigationBar];
     self.tabBarController.tabBar.hidden = YES;
+    self.tableView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1];
+    self.tableView.tableFooterView = [[UIView alloc] init];
+    [self.tableView registerClass:[SHDiaryTableViewCell class] forCellReuseIdentifier:@"cell"];
+}
+
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    SHAccountHome *account = [SHAccountTool account];
+    self.diaryDic = [NSMutableDictionary dictionaryWithDictionary:account.diaryDic];
+    NSArray *keyArr = [self.diaryDic allKeys];
+    self.keyArray =  [NSMutableArray arrayWithArray:[keyArr sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        return [obj1 compare:obj2 options:NSDiacriticInsensitiveSearch] == NSOrderedAscending;
+    }]];
+    
+    
+    [self.tableView reloadData];
 }
 
 //设置导航栏
@@ -40,7 +68,8 @@
 }
 
 - (void)rightItemAction:(UIBarButtonItem *)rightItem{
-    
+    SHWriteDiaryViewController *writeDiaryVC = [[SHWriteDiaryViewController alloc] init];
+    [self.navigationController pushViewController:writeDiaryVC animated:YES];
 }
 
 
@@ -49,67 +78,72 @@
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-#warning Incomplete implementation, return the number of sections
-    return 0;
+    return self.keyArray.count;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-#warning Incomplete implementation, return the number of rows
-    return 0;
+    NSString *key = self.keyArray[section];
+    NSArray *arr = self.diaryDic[key];
+    return arr.count;
 }
 
-/*
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:<#@"reuseIdentifier"#> forIndexPath:indexPath];
     
-    // Configure the cell...
-    
+    SHDiaryTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
+    NSString *key = self.keyArray[indexPath.section];
+    NSArray *arr = self.diaryDic[key];
+    NSDictionary *diaryModelDic = arr[indexPath.row];
+    SHDiaryModel *diaryModel = [SHDiaryModel mj_objectWithKeyValues:diaryModelDic];
+    CYAccount *cyAccount = [CYAccountTool account];
+    SHImageModel *imageModel = [SHImageTool imageModel];
+    CYAccount *otherAccount = [CYOtherAccountTool otherAccount];
+    if ([diaryModel.myUserName isEqualToString:cyAccount.userName]) {
+        if (imageModel.iconImage) {
+            cell.iconImageView.image = imageModel.iconImage;
+        }else{
+            [cell.iconImageView sd_setImageWithURL:[NSURL URLWithString:cyAccount.iconURL] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+                imageModel.iconImage = cell.iconImageView.image;
+            }];
+        }
+    }else{
+        if (imageModel.otherImage) {
+            cell.iconImageView.image = imageModel.otherImage;
+        }else{
+            [cell.iconImageView sd_setImageWithURL:[NSURL URLWithString:otherAccount.iconURL] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+                imageModel.otherImage = cell.iconImageView.image;
+            }];
+        }
+    }
+    cell.timeLabel.text = diaryModel.timeStr;
+    cell.contentLabel.text = diaryModel.contentStr;
     return cell;
 }
-*/
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    return 100;
 }
-*/
 
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
+- (nullable UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, kScreenW, 20)];
+    NSString *timeStr = self.keyArray[section];
+    timeStr = [NSString stringWithFormat:@"%@年%@月",[timeStr substringToIndex:4],[timeStr substringFromIndex:5]];
+    label.text = timeStr;
+    label.textAlignment = NSTextAlignmentCenter;
+    label.font = [UIFont boldSystemFontOfSize:14];
+    return label;
 }
-*/
 
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
+    return 20;
 }
-*/
 
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    SHWriteDiaryViewController *writeDiaryVC = [[SHWriteDiaryViewController alloc] init];
+    SHDiaryTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+    writeDiaryVC.timeStr = cell.timeLabel.text;
+    writeDiaryVC.contentStr = cell.contentLabel.text;
+    writeDiaryVC.indexRow = indexPath.row;
+    [self.navigationController pushViewController:writeDiaryVC animated:YES];
 }
-*/
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
-
 @end

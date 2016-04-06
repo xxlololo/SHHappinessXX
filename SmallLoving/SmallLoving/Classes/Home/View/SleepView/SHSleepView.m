@@ -131,7 +131,12 @@
     self.timeLabel.text = [fmt stringFromDate:now];
 }
 
-- (NSString *)createdSinceNowWithDate:(NSDate *)date{
+- (NSString *)createdSinceNowWithDate:(NSString *)date{
+    NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
+    //设置日期格式(声明字符串里面每个数字和单词的含义)
+    fmt.dateFormat = @"yyyy-MM-dd HH:mm:ss";
+    NSDate *myDate = [fmt dateFromString:date];
+
     
     //通过NSCALENDAR类来创建日期
     NSDateComponents *comp = [[NSDateComponents alloc] init];
@@ -149,13 +154,13 @@
     NSCalendarUnit unit = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
     //计算两个日期之间的差值
     
-    NSDateComponents *cmps = [calendar components:unit fromDate:date toDate:now options:0];
+    NSDateComponents *cmps = [calendar components:unit fromDate:myDate toDate:now options:0];
     
-    NSDateComponents *cmps1 = [calendar components:unit fromDate:date toDate:myDate1 options:0];
+    NSDateComponents *cmps1 = [calendar components:unit fromDate:myDate toDate:myDate1 options:0];
     
-        if ([date isYesterday]) {//昨天
+        if ([myDate isYesterday]) {//昨天
             return [NSString stringWithFormat:@"睡了%ld小时%ld分钟",(long)(cmps.hour+cmps1.hour+24),(long)(cmps.minute+cmps1.minute+60)];
-        }else if([date isToday]){//今天
+        }else if([myDate isToday]){//今天
             if (cmps.hour >= 1) {//大于一小时前发的
                 return [NSString stringWithFormat:@"睡了%ld小时%ld分钟",(long)cmps.hour,(long)cmps.minute];
             }else if(cmps.minute >= 1){//一小时内

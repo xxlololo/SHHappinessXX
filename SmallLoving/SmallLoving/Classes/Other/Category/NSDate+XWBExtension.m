@@ -57,7 +57,6 @@
     nowDateStr = [nowDateStr substringToIndex:4];
     NSString *timeDateYear = [NSString stringWithFormat:@"%@-%@",nowDateStr,timestamp];
     NSDate *date = [formatter dateFromString:timeDateYear];
-    NSLog(@"%@",date);
     //日历对象(方便比较两个日期之间的差距)
     NSCalendar *calendar = [NSCalendar currentCalendar];
     //NSCalendarUnit枚举代想获得哪些差值
@@ -72,7 +71,6 @@
         nowDateStr = [NSString stringWithFormat:@"%@%d",nowDateStr,yearStr.intValue + 1];
         timeDateYear = [NSString stringWithFormat:@"%@-%@",nowDateStr,timestamp];
         NSDate *date = [formatter dateFromString:timeDateYear];
-        NSLog(@"%@",date);
         cmps = [calendar components:unit fromDate:nowDate toDate:date options:0];
         return [NSString stringWithFormat:@"%ld",cmps.day];
     }

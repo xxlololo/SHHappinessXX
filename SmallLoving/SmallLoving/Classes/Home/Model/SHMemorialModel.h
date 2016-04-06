@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @interface SHMemorialModel : NSObject
-@property(nonatomic, strong)NSDate *memorialDate;
+@property(nonatomic, strong)NSString *memorialDate;
 @property(nonatomic, strong)NSString *memorialName;
 
 

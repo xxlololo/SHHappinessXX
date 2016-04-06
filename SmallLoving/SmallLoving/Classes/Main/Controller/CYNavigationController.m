@@ -23,6 +23,14 @@
     NSMutableDictionary * dic = [NSMutableDictionary dictionary];
     dic[NSForegroundColorAttributeName] = [UIColor whiteColor];
     [item setTitleTextAttributes:dic forState:(UIControlStateNormal)];
+
+    
+    //设置不可用状态
+    NSMutableDictionary *disableTextAtts = [NSMutableDictionary dictionary];
+    //字体颜色
+    disableTextAtts[NSForegroundColorAttributeName] = [UIColor colorWithWhite:0.8 alpha:0.5];
+    [item setTitleTextAttributes:disableTextAtts forState:UIControlStateDisabled];
+    
 }
 
 - (void)viewDidLoad {

@@ -40,21 +40,7 @@
     },
     {
       "idiom" : "universal",
-      "scale" : "3x",
-      "resizing" : {
-        "mode" : "9-part",
-        "center" : {
-          "mode" : "tile",
-          "width" : 0,
-          "height" : 0
-        },
-        "cap-insets" : {
-          "bottom" : 0,
-          "top" : 0,
-          "right" : 0,
-          "left" : 0
-        }
-      }
+      "scale" : "3x"
     }
   ],
   "info" : {

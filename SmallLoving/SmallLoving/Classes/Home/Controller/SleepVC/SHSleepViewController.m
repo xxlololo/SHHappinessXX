@@ -10,6 +10,9 @@
 #import "SHSleepView.h"
 #import "SHAccountHome.h"
 #import "SHAccountTool.h"
+#import <MJExtension.h>
+#import "CYAccount.h"
+#import "CYAccountTool.h"
 
 @interface SHSleepViewController ()
 
@@ -30,7 +33,7 @@
     [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(dataChangeAction) userInfo:nil repeats:YES];
     
     sleepView.sleepTimeLabel.text = [sleepView createdSinceNowWithDate:accountHome.sleepTimeDate];
-
+    
     [self.view addSubview:sleepView];
     
     //设置返回按钮
@@ -51,6 +54,20 @@
     accountHome.isSleep = @"NO";
     accountHome.sleepTimeDate = nil;
     //存进沙盒
+    CYAccount *cyAccount = [CYAccountTool account];
+    //上传到云端
+    if (cyAccount.accountHomeObjID) {
+        AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"SHAccountHome" objectId:cyAccount.accountHomeObjID];
+        [accountAV setObject:accountHome.mj_keyValues forKey:@"accountHome"];
+        [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+            if (succeeded) {
+                //存储到本地
+                CYLog(@"存储睡觉信息成功");
+                //存储到沙盒
+                [SHAccountTool saveAccount:accountHome];
+            }
+        }];
+    }
     [SHAccountTool saveAccount:accountHome];
     [self dismissViewControllerAnimated:YES completion:nil];
 }

@@ -17,6 +17,10 @@
 #import "SHSleepViewController.h"
 #import "SHAccountTool.h"
 #import "SHAccountHome.h"
+#import <MJExtension.h>
+#import "CYAccount.h"
+#import "CYAccountTool.h"
+#import "SHHTTPManager.h"
 
 #define kWAndH ([UIScreen mainScreen].bounds.size.width - 40) / 3
 
@@ -66,6 +70,11 @@
     
     self.picArray = @[@"extension-wake-icon",@"extension-distance-icon",@"extension-menses-icon",@"extension-album-icon",@"extension-anniversary-icon",@"extension-todo-icon"];
     self.picTitleArr = @[@"我睡了",@"发送距离",@"小姨妈",@"私密相册",@"纪念日",@"日记本"];
+    
+    __weak typeof(self) weakSelf = self;
+    [SHHTTPManager shareHTTPManager].reloadDataBlock = ^(){
+        [weakSelf.collectionView reloadData];
+    };
 }
 
 - (void)viewWillAppear:(BOOL)animated{
@@ -121,9 +130,26 @@
             SHExtensionCollectionViewCell *cell = (SHExtensionCollectionViewCell *)[collectionView cellForItemAtIndexPath:indexPath];
             cell.extensionView.imageView.image = [UIImage imageNamed:@"extension-sleeping-icon"];
             cell.extensionView.label.text = @"正在睡觉";
-            accountHome.sleepTimeDate = [NSDate date];
+            NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
+            //设置日期格式(声明字符串里面每个数字和单词的含义)
+            fmt.dateFormat = @"yyyy-MM-dd HH:mm:ss";
+            accountHome.sleepTimeDate = [fmt stringFromDate:[NSDate date]];
             accountHome.isSleep = @"YES";
             //存入沙盒
+            CYAccount *cyAccount = [CYAccountTool account];
+            if (cyAccount.accountHomeObjID) {
+            //上传到云端
+                AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"SHAccountHome" objectId:cyAccount.accountHomeObjID];
+                [accountAV setObject:accountHome.mj_keyValues forKey:@"accountHome"];
+                [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                    if (succeeded) {
+                        //存储到本地
+                        CYLog(@"存储睡觉信息成功");
+                        //存储到沙盒
+                        [SHAccountTool saveAccount:accountHome];
+                    }
+                }];
+            }
             [SHAccountTool saveAccount:accountHome];
         }];
         [alertVC addAction:actionSleep];
@@ -191,28 +217,46 @@
 
 //计算两点距离
 - (void)sendDistance{
-    //第一个坐标
-    CLLocation *current= [[CLLocation alloc] initWithLatitude:self.latitude longitude:self.longitude];
-    //第二个坐标
-    CLLocation *before= [[CLLocation alloc] initWithLatitude:32.206340 longitude:119.425600];
-    // 计算距离
-    CLLocationDistance meters = [current distanceFromLocation:before];
-    
-    NSString *distanceStr;
-    if (meters >= 1000) {//公里
-        distanceStr = [NSString stringWithFormat:@"%.1f公里",meters/1000];
-    } else {//米
-        distanceStr = [NSString stringWithFormat:@"%d米",(int)meters];
+    //获取账户信息
+    CYAccount *cyAccount = [CYAccountTool account];
+    if (cyAccount.otherUserName) {
+        AVQuery *query = [CYAccount query];
+        [query whereKey:@"userName" equalTo:cyAccount.otherUserName];
+        [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+            if (!error) {
+                CYAccount *otherAccount = [objects objectAtIndex:0];
+                //对方坐标
+                //第一个坐标
+                CLLocation *current= [[CLLocation alloc] initWithLatitude:self.latitude longitude:self.longitude];
+                
+                CLLocation *otherLoation = [[CLLocation alloc] initWithLatitude:otherAccount.latitude.doubleValue longitude:otherAccount.longitude.doubleValue];
+                // 计算距离
+                CLLocationDistance meters = [current distanceFromLocation:otherLoation];
+                NSString *distanceStr;
+                if (meters >= 1000) {//公里
+                    distanceStr = [NSString stringWithFormat:@"%.1f公里",meters/1000];
+                } else {//米
+                    distanceStr = [NSString stringWithFormat:@"%d米",(int)meters];
+                }
+                //提示框
+                UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:@"发送距离成功" message:[NSString stringWithFormat:@"你们两人距离为:%@",distanceStr] preferredStyle:(UIAlertControllerStyleActionSheet)];
+                UIAlertAction *action = [UIAlertAction actionWithTitle:@"确定" style:(UIAlertActionStyleDefault) handler:^(UIAlertAction *action) {
+                }];
+                [alertVC addAction:action];
+                // 模态显示
+                [self presentViewController:alertVC animated:YES completion:nil];
+            }
+        }];
+    } else {
+        UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:nil message:@"还没有设置另一半" preferredStyle:UIAlertControllerStyleActionSheet];
+        
+        UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            
+        }];
+        [alertVC addAction:confirm];
+        [self presentViewController:alertVC animated:YES completion:nil];
     }
     
-    //提示框
-    UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:@"发送距离成功" message:[NSString stringWithFormat:@"你们两人距离为:%@",distanceStr] preferredStyle:(UIAlertControllerStyleActionSheet)];
-    UIAlertAction *action = [UIAlertAction actionWithTitle:@"确定" style:(UIAlertActionStyleDefault) handler:^(UIAlertAction *action) {
-        
-    }];
-    [alertVC addAction:action];
-    // 模态显示
-    [self presentViewController:alertVC animated:YES completion:nil];
 }
 
 //CLLocationManagerDelegate代理方法
@@ -224,9 +268,28 @@
     CLLocationCoordinate2D coor = currentLocation.coordinate;
     self.latitude =  coor.latitude;
     self.longitude = coor.longitude;
+    //获取账户信息
+    CYAccount *cyAccount = [CYAccountTool account];
+    cyAccount.latitude = [NSString stringWithFormat:@"%f",self.latitude];
+    cyAccount.longitude = [NSString stringWithFormat:@"%f",self.longitude];
+    //存储到沙盒
+    //上传到云端
+    [CYAccountTool saveAccount:cyAccount];
+    //上传到云端
+    AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"CYAccount" objectId:cyAccount.objectId];
+    [accountAV setObject:cyAccount.latitude forKey:@"latitude"];
+    [accountAV setObject:cyAccount.longitude forKey:@"longitude"];
+    [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+        if (succeeded) {
+            //存储到本地
+            CYLog(@"存储位置坐标成功");
+            [CYAccountTool saveAccount:cyAccount];
+        }
+    }];
+
     [self sendDistance];
     //[self.locationManager stopUpdatingLocation];
-    
+
 }
 
 //更新失败的方法

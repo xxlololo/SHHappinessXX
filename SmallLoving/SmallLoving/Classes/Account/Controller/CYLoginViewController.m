@@ -14,6 +14,12 @@
 #import "CYAccountTool.h"
 #import "CYAccount.h"
 #import "CYRootTool.h"
+#import "SHAccountTool.h"
+#import <MJExtension.h>
+#import "CYOtherAccountTool.h"
+#import "SHImageTool.h"
+#import "SHHTTPManager.h"
+
 @interface CYLoginViewController ()
 
 /**
@@ -25,6 +31,10 @@
  *  小菊花
  */
 @property (nonatomic, weak) MBProgressHUD * hud;
+
+@property(nonatomic, strong)CYAccount *cyAccount;
+
+
 
 @end
 
@@ -62,11 +72,57 @@
     if (!error && user.mobilePhoneVerified) {
         [self.hud hide:YES];
         // 储存到本地
-        CYAccount * account = [CYAccount new];
-        account.userName = self.loginView.userNameTf.text;
-        account.password = self.loginView.passwordTf.text;
-        [CYAccountTool saveAccount:account];
-        [CYRootTool setRootViewController];        
+        self.cyAccount = [CYAccount new];
+        self.cyAccount.userName = self.loginView.userNameTf.text;
+        self.cyAccount.password = self.loginView.passwordTf.text;
+        [CYAccountTool saveAccount:self.cyAccount];
+        //存储到服务器
+        //同步服务器数据到本地
+        
+        [[SHHTTPManager shareHTTPManager] synchronizationAccountWithCyAccount:self.cyAccount];
+        
+//        AVQuery *query = [CYAccount query];
+//        __weak typeof(self) weakSelf = self;
+//        [query whereKey:@"userName" equalTo:self.cyAccount.userName];
+//        [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+//            if (!error) {
+//                weakSelf.cyAccount = [objects objectAtIndex:0];
+//                if (weakSelf.cyAccount.otherUserName) {
+//                //同步home数据到本地
+//                AVQuery *query = [AVQuery queryWithClassName:@"SHAccountHome"];
+//                [query getObjectInBackgroundWithId:weakSelf.cyAccount.accountHomeObjID block:^(AVObject *object, NSError *error) {
+//                    NSDictionary *accountHomeDic = [object objectForKey:@"accountHome"];
+//                    SHAccountHome *accountHome = [SHAccountTool account];
+//                    accountHome = [SHAccountHome mj_objectWithKeyValues:accountHomeDic];
+//                    [SHAccountTool saveAccount:accountHome];
+//                    SHImageModel *imageModel = [SHImageTool imageModel];
+//                    imageModel.photosArr = [NSMutableArray array];
+//                    if (accountHome.photoUrlArray) {
+//                        dispatch_async(dispatch_get_global_queue(0, 0), ^{
+//                            for (NSString *photoUrl in accountHome.photoUrlArray) {
+//                                NSData * data = [NSData dataWithContentsOfURL:[NSURL URLWithString:photoUrl]];
+//                                [imageModel.photosArr addObject:[UIImage imageWithData:data]];
+//                            }
+//                            [SHImageTool saveImageModel:imageModel];
+//                        });
+//                    }
+//                    [SHImageTool saveImageModel:imageModel];
+//                    AVQuery *query = [CYAccount query];
+//                    [query whereKey:@"userName" equalTo:weakSelf.cyAccount.otherUserName];
+//                    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+//                        if (!error) {
+//                            CYAccount *otherAccount = [objects objectAtIndex:0];
+//                            [CYOtherAccountTool saveOtherAccount:otherAccount];
+//                        }
+//                    }];
+//                    [CYAccountTool saveAccount:weakSelf.cyAccount];
+//                }];
+//                }
+//            }
+//        }];
+
+
+        [CYRootTool setRootViewController];
     } else {
         [self.hud hide:YES];
         [CYAlertController showAlertControllerWithTitle:@"失败" message:@"登录失败, 请重试" preferredStyle:(UIAlertControllerStyleActionSheet) isSucceed:NO viewController:self];

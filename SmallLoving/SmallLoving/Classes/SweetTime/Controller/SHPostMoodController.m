@@ -9,16 +9,12 @@
 #define CWScreenW  [UIScreen mainScreen].bounds.size.width
 #define kY self.view.frame.size.width-40
 #import "SHPostMoodController.h"
-#import "THEditPhotoView.h"
-#import "SHSweetSpaceController.h"
 #import "SHPostMood.h"
-#import "SHFMDB.h"
-#import "SHSweetSpaceItem.h"
-#import "SHPostMoodController.h"
-@interface SHPostMoodController ()<UINavigationControllerDelegate,UIImagePickerControllerDelegate,THEditPhotoViewDelegate,UITextViewDelegate>
-@property (nonatomic,weak)THEditPhotoView *editPhotoView;
+#import <AVObject.h>
+#import "CYAccountTool.h"
+#import "CYAccount.h"
+@interface SHPostMoodController ()<UITextViewDelegate,UITextFieldDelegate>
 @property (nonatomic,strong)SHPostMood *postMood;
-@property (nonatomic,strong)SHSweetSpaceItem *spaceItem;
 
 
 @end
@@ -37,25 +33,11 @@
     self.navigationItem.title = @"书写心情";
     [self layoutView];
     self.postMood.headButton.userInteractionEnabled =YES ;
-    self.postMood.textV.delegate = self ;
-//    [self layoutViews];
-    
+    self.postMood.textV.delegate = self;
+    self.postMood.titleField.delegate = self;
     
 }
 
-- (NSMutableArray *)array{
-    if (!_array) {
-        _array = [NSMutableArray array];
-    }
-    return _array ;
-}
-- (THEditPhotoView *)editPhotoView{
-    if (!_editPhotoView) {
-        _editPhotoView = [THEditPhotoView editPhotoView];
-        
-    }
-    return _editPhotoView ;
-}
 - (void)viewDidAppear:(BOOL)animated{
     [self.postMood.titleField becomeFirstResponder];
 }
@@ -71,22 +53,8 @@
 }
 - (void)textViewDidBeginEditing:(UITextView *)textView{
     self.postMood.promptTitle.hidden = YES;
-
-    
 }
 
-
-
-
-//- (void)layoutViews{
-//    THEditPhotoView *editPhotoView = [THEditPhotoView editPhotoView];
-//    editPhotoView.frame = CGRectMake(10, 230, CWScreenW, 120);
-//    editPhotoView.delegate = self ;
-//    self.editPhotoView = editPhotoView ;
-//    [self.view addSubview:editPhotoView];
-//    //修复文本框是否偏移
-//    self.automaticallyAdjustsScrollViewInsets = NO;
-//}
 
 - (void)rightBtnClick{
     if(self.postMood.titleField.text.length ==0 &&self.postMood.textV.text.length == 0){
@@ -105,37 +73,32 @@
         [alert addAction:action2];
         [self showDetailViewController:alert sender:nil];
     }else{
-        SHSweetSpaceController *sweetSpace = [[SHSweetSpaceController alloc]init];
-        sweetSpace.pictureArr = self.array;
-        //block传值
-        self.callValue(self.postMood.titleField.text,self.postMood.textV.text,self.array);
-        
-        NSString *icon = @"hero";
-        NSString *name = @"小幸福";
-        NSString *vip = @"1";
+
         NSDate *date = [NSDate dateWithTimeIntervalSinceNow:0];
         NSDateFormatter *formatter =[[NSDateFormatter alloc] init];
-        formatter.dateFormat = @"YYYY-MM-dd";
-        if ([self.postMood.titleField.text isEqualToString:@""]) {
-            self.titleString = @"(没有标题)";
-            
-        }else{
+        formatter.dateFormat = @"YYYY-MM-dd HH:mm:ss";
+        
          self.titleString = self.postMood.titleField.text;
 
-        }
-        if ([self.postMood.textV.text isEqualToString:@""]) {
-            self.textString = @"(没有内容)";
-        }else{
-            self.textString = self.postMood.textV.text;
-        }
+        
+        
+        self.textString = self.postMood.textV.text;
+        
         NSString *timestamp = [formatter stringFromDate:date];
-        [[SHFMDB sharedSHFMDB]insertSpaceItem:self.spaceItem titleText:self.titleString icon:[NSString stringWithFormat:@"%@",icon] name:[NSString stringWithFormat:@"%@",name] contentText:self.textString dateText:timestamp];
-        self.spaceItem.titleText = self.titleString;
-        self.spaceItem.text = self.textString ;
-        self.spaceItem.icon = icon ;
-        self.spaceItem.name = name;
-        self.spaceItem.vip = vip;
-        [sweetSpace.tableView reloadData];
+        CYAccount *cyAccount = [CYAccountTool account];
+        
+        //上传到云端
+        AVObject *moodAV = [[AVObject alloc] initWithClassName:@"SweetTime"];// 构建对象
+        [moodAV setObject:self.titleString forKey:@"titleString"];// 标题
+        [moodAV setObject:self.textString forKey:@"textString"];// 内容
+        [moodAV setObject:cyAccount.iconURL forKey:@"iconURL"]; //头像
+        [moodAV setObject:cyAccount.nickName forKey:@"nickName"]; //昵称
+        [moodAV setObject:timestamp forKey:@"timestamp"];//时间
+        [moodAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+            if (succeeded) {
+                CYLog(@"心情存储成功");
+            }
+        }];
         
     }
     [self.navigationController popViewControllerAnimated:YES];
@@ -159,25 +122,43 @@
     [super touchesBegan:touches withEvent:event];
     [self.view endEditing:YES];
 }
-#pragma mark - 各种代理方法
-//-(void)editPhotoViewToOpenAblum:(THEditPhotoView *)editView{
-//    UIImagePickerController *pickView = [[UIImagePickerController alloc]init];
-//    pickView.delegate = self;
-//    pickView.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-//    [self presentViewController:pickView animated:YES completion:nil];
-//}
 
-//点击图片成功
-//-(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingImage:(UIImage *)image editingInfo:(NSDictionary<NSString *,id> *)editingInfo{
-//    
-//    [self.editPhotoView addOneImage:image];
-//    [self.array addObject:image];
-//    [picker dismissViewControllerAnimated:YES completion:nil];
-//}
-//
-//点击pickerview的取消，不加图片了
-//-(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker{
-//    
-//}
+//判断是否超出最大限额 140
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text{
+    
+    if ([text isEqualToString:@""] && range.length > 0) {
+        //删除字符肯定是安全的
+        return YES;
+    }
+    else {
+        if (self.postMood.textV.text.length - range.length + text.length > 140) {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"超出最大可输入长度" message:nil delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil];
+            [alert show];
+            return NO;
+        }else {
+            return YES;
+        }
+    }
+}
+
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string{
+    if ([string isEqualToString:@"\n"])
+    {
+        return YES;
+    }
+    NSString * toBeString = [textField.text stringByReplacingCharactersInRange:range withString:string];
+    
+    if (self.postMood.titleField == textField)
+    {
+        if ([toBeString length] > 20) {
+            textField.text = [toBeString substringToIndex:20];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"超过最大字数不能输入了" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+            [alert show];
+            return NO;
+        }
+    }
+    return YES;
+}
+
 
 @end

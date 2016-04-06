@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9531" systemVersion="15A284" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9531" systemVersion="15D21" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
@@ -12,7 +12,7 @@
             <rect key="frame" x="0.0" y="0.0" width="347" height="89"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="347" height="88"/>
+                <rect key="frame" x="0.0" y="0.0" width="347" height="88.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="iqu-1F-x2l">
@@ -22,20 +22,22 @@
                         </constraints>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="787-E0-Pa9">
-                        <rect key="frame" x="95" y="18" width="154" height="20"/>
+                        <rect key="frame" x="95" y="18" width="31" height="19.5"/>
                         <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ikc-7r-hEv">
-                        <rect key="frame" x="292" y="28" width="45" height="32"/>
+                        <rect key="frame" x="277" y="29" width="60" height="30"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="45" id="uUv-R0-ex6"/>
+                            <constraint firstAttribute="width" constant="60" id="7NV-1j-iw4"/>
+                            <constraint firstAttribute="height" constant="30" id="gc2-4h-YWk"/>
                         </constraints>
-                        <state key="normal" title="Button" image="start1.png"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                        <state key="normal" title="启动" backgroundImage="album-delete-btn"/>
                     </button>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="smstitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mny-Wb-u3p">
-                        <rect key="frame" x="95" y="47" width="149" height="28"/>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="smstitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mny-Wb-u3p">
+                        <rect key="frame" x="95" y="52" width="48" height="16"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="193" id="Fm3-do-3Aq"/>
                             <constraint firstAttribute="height" constant="26" id="HVd-76-WGx"/>
@@ -64,13 +66,11 @@
                     <constraint firstItem="mny-Wb-u3p" firstAttribute="leading" secondItem="iqu-1F-x2l" secondAttribute="trailing" constant="8" id="7Ny-fc-k2G">
                         <variation key="heightClass=regular-widthClass=compact" constant="8"/>
                     </constraint>
-                    <constraint firstItem="ikc-7r-hEv" firstAttribute="leading" secondItem="787-E0-Pa9" secondAttribute="trailing" constant="43" id="9Lx-xZ-3Zs"/>
                     <constraint firstItem="mny-Wb-u3p" firstAttribute="leading" secondItem="iqu-1F-x2l" secondAttribute="trailing" constant="25" id="B4D-lJ-miP"/>
-                    <constraint firstAttribute="trailing" secondItem="ikc-7r-hEv" secondAttribute="trailing" constant="10" id="BTD-ET-iAX"/>
                     <constraint firstItem="iqu-1F-x2l" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" constant="10" id="GRM-rj-ac8"/>
                     <constraint firstAttribute="bottom" secondItem="iqu-1F-x2l" secondAttribute="bottom" constant="13" id="H3b-qu-WXs"/>
-                    <constraint firstItem="ikc-7r-hEv" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="28" id="L71-dr-FWT"/>
                     <constraint firstItem="mny-Wb-u3p" firstAttribute="top" secondItem="787-E0-Pa9" secondAttribute="bottom" constant="17" id="Mc5-8d-igG"/>
+                    <constraint firstAttribute="trailing" secondItem="ikc-7r-hEv" secondAttribute="trailing" constant="10" id="NB2-d0-mtj"/>
                     <constraint firstAttribute="bottom" secondItem="iqu-1F-x2l" secondAttribute="bottom" constant="10" id="NvR-eC-sDu"/>
                     <constraint firstAttribute="bottom" secondItem="mny-Wb-u3p" secondAttribute="bottom" constant="20" id="Oe9-6R-2cJ"/>
                     <constraint firstItem="iqu-1F-x2l" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="25" id="QaI-FX-57G"/>
@@ -93,9 +93,9 @@
                     <constraint firstItem="mny-Wb-u3p" firstAttribute="leading" secondItem="iqu-1F-x2l" secondAttribute="trailing" constant="8" symbolic="YES" id="eoa-Rc-jmd">
                         <variation key="heightClass=regular-widthClass=compact" constant="8"/>
                     </constraint>
+                    <constraint firstItem="ikc-7r-hEv" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="g1g-Ei-R4d"/>
                     <constraint firstAttribute="bottom" secondItem="iqu-1F-x2l" secondAttribute="bottom" id="hrX-NU-yDU"/>
                     <constraint firstItem="iqu-1F-x2l" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="ih2-zj-3Gs"/>
-                    <constraint firstAttribute="bottom" secondItem="ikc-7r-hEv" secondAttribute="bottom" constant="28" id="mpQ-fQ-fOo"/>
                     <constraint firstItem="787-E0-Pa9" firstAttribute="leading" secondItem="iqu-1F-x2l" secondAttribute="trailing" constant="25" id="qqz-n7-7K5"/>
                     <constraint firstItem="mny-Wb-u3p" firstAttribute="top" secondItem="787-E0-Pa9" secondAttribute="bottom" constant="10" id="wsN-F2-9c7"/>
                 </constraints>
@@ -140,6 +140,6 @@
         </tableViewCell>
     </objects>
     <resources>
-        <image name="start1.png" width="82" height="40"/>
+        <image name="album-delete-btn" width="9" height="8"/>
     </resources>
 </document>

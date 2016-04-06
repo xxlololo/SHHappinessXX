@@ -9,6 +9,8 @@
 #import "SHAuntIsComing.h"
 #import "SHAccountHome.h"
 #import "UIImage+GIF.h"
+#import "CYAccount.h"
+#import "CYAccountTool.h"
 
 @implementation SHAuntIsComing
 - (instancetype)initWithFrame:(CGRect)frame
@@ -128,17 +130,18 @@
 
 - (void)setupViewWithAccountHome:(SHAccountHome *)accountHome{
     self.backgroundColor = SHColorCreater(251, 232, 243, 1);
+    CYAccount *cyAccount = [CYAccountTool account];
     if ([accountHome.isMenstruation isEqualToString:@"YES"]) {//正处在姨妈期
         self.auntTowelFirstLabel.text = nil;
         self.auntTowelSecondLabel.text = nil;
-        if ([accountHome.sex isEqualToString:@"m"]) {
+        if ([cyAccount.sex isEqualToString:@"m"]) {
             self.auntComeImageView.hidden = YES;
             self.auntTowelImageView.hidden = NO;
             self.auntTowelImageView.image = [UIImage imageNamed:@"menses-coming-bg"];
             self.manLabel.hidden = NO;
             self.womanBtn.hidden = YES;
             self.manLabel.text = @"她的姨妈来了,要加倍呵护他哦";
-        } else if ([accountHome.sex isEqualToString:@"f"]){
+        } else if ([cyAccount.sex isEqualToString:@"f"]){
             self.auntComeImageView.hidden = NO;
             self.auntTowelImageView.hidden = YES;
             self.manLabel.hidden = YES;
@@ -155,16 +158,21 @@
     self.auntTowelImageView.image = [UIImage imageNamed:@"menses-top-bg"];
     self.auntComeImageView.hidden = YES;
     self.auntTowelImageView.hidden = NO;
+    CYAccount *cyAccount = [CYAccountTool account];
     //月经差几天到来
-    NSDateComponents *cmps = [self auntTowelSecondLabelWithLastAuntDate:accountHome.lastAuntDate];
+    NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
+    //设置日期格式(声明字符串里面每个数字和单词的含义)
+    fmt.dateFormat = @"yyyy-MM-dd";
+    
+    NSDateComponents *cmps = [self auntTowelSecondLabelWithLastAuntDate:[fmt dateFromString:accountHome.lastAuntDate]];
     if (accountHome.lastAuntDate) {//如果设置了月经信息
         if (labs([accountHome.interval integerValue] - (long)cmps.day % [accountHome.interval integerValue]) > 3) {//如果天数大于三天
-            if ([accountHome.sex isEqualToString:@"m"]) {//如果是男性
+            if ([cyAccount.sex isEqualToString:@"m"]) {//如果是男性
                 self.manLabel.hidden = NO;
                 self.womanBtn.hidden = YES;
                 self.auntTowelFirstLabel.text = @"距离她的姨妈大驾光临还有";
                 self.manLabel.text = @"可以和她尽情愉快地玩耍啦!";
-            }else if ([accountHome.sex isEqualToString:@"f"]){//如果是女性
+            }else if ([cyAccount.sex isEqualToString:@"f"]){//如果是女性
                 self.manLabel.hidden = YES;
                 self.womanBtn.hidden = NO;
                 self.auntTowelFirstLabel.text = @"距离姨妈大驾光临还有";
@@ -172,13 +180,13 @@
             }
             [self setupAuntTowelSecondLabelWithAccountHome:accountHome];
         }else{//如果小于三天
-            if ([accountHome.sex isEqualToString:@"m"]) {//如果是男性
+            if ([cyAccount.sex isEqualToString:@"m"]) {//如果是男性
                 self.manLabel.hidden = NO;
                 self.womanBtn.hidden = YES;
                 self.auntTowelFirstLabel.text = nil;
                 self.auntTowelSecondLabel.text = @"她的姨妈将在近期光临";
                 self.manLabel.text = @"去提醒她多注意一下吧";
-            }else if ([accountHome.sex isEqualToString:@"f"]){//如果是女性
+            }else if ([cyAccount.sex isEqualToString:@"f"]){//如果是女性
                 self.manLabel.hidden = YES;
                 self.womanBtn.hidden = NO;
                 self.auntTowelFirstLabel.text = nil;
@@ -187,12 +195,12 @@
             }
         }
     }else{//如果没有设置月经信息
-        if ([accountHome.sex isEqualToString:@"f"]) {//如果是女性
+        if ([cyAccount.sex isEqualToString:@"f"]) {//如果是女性
             self.auntTowelFirstLabel.text = @"还没有设置月经信息哦";
             self.auntTowelSecondLabel.text = @"点击右上角设置月经信息";
             self.manLabel.hidden = YES;
             self.womanBtn.hidden = YES;
-        }else if ([accountHome.sex isEqualToString:@"m"]){//如果是男性
+        }else if ([cyAccount.sex isEqualToString:@"m"]){//如果是男性
             self.auntTowelFirstLabel.text = @"她还没有设置月经信息哦";
             self.auntTowelSecondLabel.text = @"快去提醒她";
             self.manLabel.hidden = YES;
@@ -204,7 +212,12 @@
 //设置月经差多久到来
 - (void)setupAuntTowelSecondLabelWithAccountHome:(SHAccountHome *)accountHome{
     //月经差几天到来
-    NSDateComponents *cmps = [self auntTowelSecondLabelWithLastAuntDate:accountHome.lastAuntDate];
+    //月经差几天到来
+    NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
+    //设置日期格式(声明字符串里面每个数字和单词的含义)
+    fmt.dateFormat = @"yyyy-MM-dd";
+
+    NSDateComponents *cmps = [self auntTowelSecondLabelWithLastAuntDate:[fmt dateFromString:accountHome.lastAuntDate]];
      long timeInterval = [accountHome.interval integerValue] - (long)cmps.day % [accountHome.interval integerValue];
     self.auntTowelSecondLabel.text = [NSString stringWithFormat:@"%ld天%ld小时%ld分%ld秒",timeInterval, 24 - (long)cmps.hour, 60 - (long)cmps.minute, 60 - (long)cmps.second];
 //    long timeInterval = [accountHome.interval integerValue] - (long)cmps.day - 1;

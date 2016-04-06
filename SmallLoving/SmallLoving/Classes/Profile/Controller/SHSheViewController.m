@@ -8,14 +8,26 @@
 
 #import "SHSheViewController.h"
 #import "SHLeftBackButton.h"
+#import "CYAccountTool.h"
+#import "CYAccount.h"
+#import "CYOtherAccountTool.h"
+#import "SHImageTool.h"
+#import <UIImageView+WebCache.h>
+#import "SHIconTableViewCell.h"
+#import "SHNickNameTableViewCell.h"
+#import "SHOtherViewController.h"
+#import "MBProgressHUD.h"
+#import "SHAccountTool.h"
+#import "CYOtherAccountTool.h"
+#import "SHImageTool.h"
+
 
 
 @interface SHSheViewController ()<UITableViewDataSource,UITableViewDelegate>
+@property(nonatomic,strong)MBProgressHUD * hud;
 @property(nonatomic,strong)UITableView *tableview;
-@property(nonatomic,strong)UIImageView *image;
-@property(nonatomic,strong)UILabel *label1;
-@property(nonatomic,strong)UILabel *label2;
-@property(nonatomic,strong)UILabel *label3;
+@property(nonatomic,strong)CYAccount *otherAccount;
+
 @end
 
 @implementation SHSheViewController
@@ -30,7 +42,9 @@
     [self.view addSubview:self.tableview];
     
     
-    [self.tableview registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
+    [self.tableview registerClass:[SHIconTableViewCell class] forCellReuseIdentifier:@"cell"];
+    [self.tableview registerClass:[SHNickNameTableViewCell class] forCellReuseIdentifier:@"cell1"];
+    [self.tableview registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell2"];
     
     self.tableview.delegate=self;
     self.tableview.dataSource=self;
@@ -42,8 +56,41 @@
     [backButton addTarget:self action:@selector(leftItemAction:) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *leftItem = [[UIBarButtonItem alloc] initWithCustomView:backButton];
     self.navigationItem.leftBarButtonItem = leftItem;
-    
+    self.otherAccount = [CYOtherAccountTool otherAccount];
 }
+
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    CYAccount *cyAccount = [CYAccountTool account];
+    if (cyAccount.otherUserName) {
+        AVQuery *query = [CYAccount query];
+        __weak typeof(self) weakSelf = self;
+        [query whereKey:@"userName" equalTo:cyAccount.otherUserName];
+        [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+            if (!error) {
+                weakSelf.otherAccount = [objects objectAtIndex:0];
+                [CYOtherAccountTool saveOtherAccount:weakSelf.otherAccount];
+                [weakSelf.tableview reloadData];
+            }
+        }];
+    }else{
+        UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:nil message:@"您还没有设置另一半账户" preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+            
+        }];
+        
+        UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"现在就去" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            SHOtherViewController *otherVC = [[SHOtherViewController alloc] init];
+            [self.navigationController pushViewController:otherVC animated:YES];
+        }];
+        
+        [alertVC addAction:cancel];
+        [alertVC addAction:confirm];
+        [self presentViewController:alertVC animated:YES completion:nil];
+    }
+}
+
 - (void)leftItemAction:(UIBarButtonItem *)leftItem{
     [self.navigationController popViewControllerAnimated:YES];
 }
@@ -57,7 +104,7 @@
 //设置每个分组下tableview的行数
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     if (section==0) {
-        return 5;
+        return 4;
     }else{
         return 1;
     }
@@ -86,67 +133,40 @@
 
 //设置每行对应的cell（展示的内容）
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    UITableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+    SHNickNameTableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:@"cell1"];
     if (indexPath.section==0 && indexPath.row==0) {
-        UILabel *labelpic = [[UILabel alloc]initWithFrame:CGRectMake(10, 25, 100, 30)];
-        labelpic.text = @"头像";
-        [cell addSubview:labelpic];
-        //自己的头像
-        UIImageView *image1 = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"menses-gender-woman"]];
-        image1.frame = CGRectMake(kScreenW-100, 5, 70, 70);
-        _image = image1;
-        [cell addSubview:image1];
+        SHIconTableViewCell *iconCell = [tableView dequeueReusableCellWithIdentifier:
+                                         @"cell"];
+        [iconCell.iconImageView sd_setImageWithURL:[NSURL URLWithString:self.otherAccount.iconURL] placeholderImage:self.sheIconImage completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+            if (!error) {
+                SHImageModel *imageModel = [SHImageTool imageModel];
+                imageModel.otherImage = image;
+                [SHImageTool saveImageModel:imageModel];
+            }
+        }];
+        iconCell.iconLabel.text = @"头像";
+        return iconCell;
     }
     if(indexPath.section == 0 && indexPath.row == 1){
-        UILabel *labelname = [[UILabel alloc]initWithFrame:CGRectMake(10, 5, 100, 30)];
-        labelname.text = @"昵称";
-        [cell addSubview:labelname];
+        cell.nameLabel.text = @"昵称";
         //自己的昵称
-        UILabel *labelnamenew = [[UILabel alloc]initWithFrame:CGRectMake(kScreenW-230, 5, 200, 30)];
-        labelnamenew.text = @"她";
-        labelnamenew.textAlignment = NSTextAlignmentRight;
-        _label1 = labelnamenew;
-        [cell addSubview:labelnamenew];
+        cell.nickNameLabel.text = self.otherAccount.nickName;
     }
     if(indexPath.section == 0 && indexPath.row == 2){
-        UILabel *labelnum = [[UILabel alloc]initWithFrame:CGRectMake(10, 5, 100, 30)];
-        labelnum.text = @"恩爱号";
-        [cell addSubview:labelnum];
-        //自己的昵称
-        UILabel *labelnumnew = [[UILabel alloc]initWithFrame:CGRectMake(kScreenW-230, 5, 200, 30)];
-        labelnumnew.text = @"123456";
-        labelnumnew.textAlignment = NSTextAlignmentRight;
-        _label2 = labelnumnew;
-        [cell addSubview:labelnumnew];
+        cell.nameLabel.text = @"幸福号";
+        cell.nickNameLabel.text = self.otherAccount.userName;
     }
     if(indexPath.section == 0 && indexPath.row == 3){
-        UILabel *labelnum = [[UILabel alloc]initWithFrame:CGRectMake(10, 5, 100, 30)];
-        labelnum.text = @"手机号";
-        [cell addSubview:labelnum];
-        //自己的昵称
-        UILabel *labelnumnew = [[UILabel alloc]initWithFrame:CGRectMake(kScreenW-230, 5, 200, 30)];
-        labelnumnew.text = @"123456";
-        labelnumnew.textAlignment = NSTextAlignmentRight;
-        _label2 = labelnumnew;
-        [cell addSubview:labelnumnew];
-    }
-    if(indexPath.section == 0 && indexPath.row == 4){
-        UILabel *labelnum = [[UILabel alloc]initWithFrame:CGRectMake(10, 5, 100, 30)];
-        labelnum.text = @"邮箱";
-        [cell addSubview:labelnum];
-        //自己的昵称
-        UILabel *labelmail = [[UILabel alloc]initWithFrame:CGRectMake(kScreenW-230, 5, 200, 30)];
-        labelmail.text = @"123@gmail.com";
-        labelmail.textAlignment = NSTextAlignmentRight;
-        _label3 = labelmail;
-        [cell addSubview:labelmail];
+        cell.nameLabel.text = @"手机号";
+        cell.nickNameLabel.text = self.otherAccount.userName;
     }
     if(indexPath.section == 1){
-        cell.textLabel.text=@"解除关系";
-        cell.textLabel.textColor = [UIColor redColor];
-        cell.textLabel.textAlignment=NSTextAlignmentCenter;
+        UITableViewCell *tabCell = [tableView dequeueReusableCellWithIdentifier:@"cell2"];
+        tabCell.textLabel.text=@"解除关系";
+        tabCell.textLabel.textColor = [UIColor redColor];
+        tabCell.textLabel.textAlignment=NSTextAlignmentCenter;
+        return tabCell;
     }
-        
     return cell;
 }
 
@@ -171,6 +191,70 @@
 }
 
 -(void)unchain{
-    NSLog(@"谁不分手谁小狗,汪汪汪!!");
+    //保存
+    CYAccount *cyAccount = [CYAccountTool account];
+    NSString *otherUserName = cyAccount.otherUserName;
+    NSString *accountHomeObjID = cyAccount.accountHomeObjID;
+    cyAccount.otherUserName = nil;
+    cyAccount.accountHomeObjID = nil;
+    SHImageModel *imageModel = [SHImageTool imageModel];
+    imageModel.otherImage = nil;
+    imageModel.photosArr = nil;
+    imageModel.coverImage = nil;
+    
+    //上传到云端
+    AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"CYAccount" objectId:cyAccount.objectId];
+    [accountAV setObject:cyAccount.otherUserName forKey:@"otherUserName"];
+    [accountAV setObject:cyAccount.accountHomeObjID forKey:@"accountHomeObjID"];
+    
+    
+    __weak typeof(self) weakSelf = self;
+    [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+        if (succeeded) {
+            //存储到本地
+            CYLog(@"关系解除成功");
+            [CYAccountTool saveAccount:cyAccount];
+            [SHImageTool saveImageModel:imageModel];
+            //清除本地信息
+            [CYOtherAccountTool removeOtherAccount];
+            [SHAccountTool removeAccountHome];
+            
+            //取出服务器存储的home信息 删除
+            AVObject *accountHomeAV = [AVObject objectWithoutDataWithClassName:@"SHAccountHome" objectId:accountHomeObjID];
+            [accountHomeAV deleteInBackground];
+            
+            //将另一半账号相关信息制空
+            AVQuery *query = [CYAccount query];
+            [query whereKey:@"userName" equalTo:otherUserName];
+            [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+                if (!error) {
+                    CYAccount *otherAccount = [objects objectAtIndex:0];
+                    otherAccount.otherUserName = nil;
+                    [otherAccount setObject:nil forKey:@"otherUserName"];
+                    otherAccount.accountHomeObjID = nil;
+                    [otherAccount setObject:nil forKey:@"accountHomeObjID"];
+                    [otherAccount saveInBackground];
+                }
+            }];
+
+            
+            UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:nil message:@"关系解除成功" preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                [weakSelf.navigationController popViewControllerAnimated:YES];
+            }];
+            [alertVC addAction:confirm];
+            [weakSelf.hud removeFromSuperview];
+            [weakSelf presentViewController:alertVC animated:YES completion:nil];
+        }
+    }];
+}
+
+- (void)layoutHUD {
+    self.hud = [[MBProgressHUD alloc]initWithView:self.view];
+    self.hud.frame = self.view.bounds;
+    self.hud.labelText = @"关系解除中...";
+    self.hud.mode = MBProgressHUDModeIndeterminate;
+    [self.view addSubview:self.hud];
+    [self.hud show:YES];
 }
 @end

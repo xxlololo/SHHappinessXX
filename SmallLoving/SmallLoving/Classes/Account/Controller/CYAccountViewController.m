@@ -38,9 +38,9 @@
 - (void)addAllTargetAction {
     [self.accountView.registBtn addTarget:self action:@selector(registAction) forControlEvents:(UIControlEventTouchUpInside)];
     [self.accountView.loginBtn addTarget:self action:@selector(loginAction) forControlEvents:(UIControlEventTouchUpInside)];
-    [self.accountView.qqLoginBtn addTarget:self action:@selector(qqLoginAction) forControlEvents:(UIControlEventTouchUpInside)];
-    [self.accountView.weChatLoginBtn addTarget:self action:@selector(weChatLoginAction) forControlEvents:(UIControlEventTouchUpInside)];
-    [self.accountView.weiBoLoginBtn addTarget:self action:@selector(weiBoLoginAction) forControlEvents:(UIControlEventTouchUpInside)];
+//    [self.accountView.qqLoginBtn addTarget:self action:@selector(qqLoginAction) forControlEvents:(UIControlEventTouchUpInside)];
+//    [self.accountView.weChatLoginBtn addTarget:self action:@selector(weChatLoginAction) forControlEvents:(UIControlEventTouchUpInside)];
+//    [self.accountView.weiBoLoginBtn addTarget:self action:@selector(weiBoLoginAction) forControlEvents:(UIControlEventTouchUpInside)];
 }
 
 - (void)viewWillAppear:(BOOL)animated {

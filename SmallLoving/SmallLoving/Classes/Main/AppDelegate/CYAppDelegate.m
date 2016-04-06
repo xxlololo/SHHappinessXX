@@ -7,36 +7,89 @@
 //
 
 #import "CYAppDelegate.h"
-#import <AVOSCloud/AVOSCloud.h>
 #import "CYRootTool.h"
 #import "AVOSCloudSNS.h"
+#import "CYAccount.h"
+#import "CYAccountTool.h"
+#import "SHAccountTool.h"
+#import <MJExtension.h>
+#import "CYOtherAccountTool.h"
+#import "SHImageTool.h"
+#import "SHUserFactory.h"
+#import <CDChatManager.h>
+#import "SHHTTPManager.h"
+
+@interface CYAppDelegate ()
+@property(nonatomic, strong)CYAccount *cyAccount;
+
+@end
 
 @implementation CYAppDelegate
-
 /**
  *  程序准备就绪即将运行
  */
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [AVOSCloud setApplicationId:@"Ew9cDwywySOU9LJDUGPYBdja-gzGzoHsz"
-                      clientKey:@"OI5RnPPOR7HcJyNQEALVj7aO"];
+    [AVOSCloud setApplicationId:@"DHichWmxlTo8kqRxBn0Cb6n6-gzGzoHsz"
+                      clientKey:@"gNgUECeDt6sQPWD83QxYH5JO"];
+    [CYAccount registerSubclass];
     self.window = [[UIWindow alloc]initWithFrame:[UIScreen mainScreen].bounds];
     self.window.backgroundColor = [UIColor whiteColor];
     
+    //重置账户信息
+    
+    self.cyAccount = [CYAccountTool account];
+    if (self.cyAccount) {
+//        AVQuery *query = [CYAccount query];
+//        __weak typeof(self) weakSelf = self;
+//        [query whereKey:@"userName" equalTo:self.cyAccount.userName];
+//        [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+//            if (!error) {
+//                weakSelf.cyAccount = [objects objectAtIndex:0];
+//                
+//                //同步home数据到本地
+//                AVQuery *query = [AVQuery queryWithClassName:@"SHAccountHome"];
+//                [query getObjectInBackgroundWithId:weakSelf.cyAccount.accountHomeObjID block:^(AVObject *object, NSError *error) {
+//                    NSDictionary *accountHomeDic = [object objectForKey:@"accountHome"];
+//                    SHAccountHome *accountHome = [SHAccountTool account];
+//                    accountHome = [SHAccountHome mj_objectWithKeyValues:accountHomeDic];
+//                    
+//                    SHImageModel *imageModel = [SHImageTool imageModel];
+//                    if (accountHome.photoUrlArray) {
+//                        dispatch_async(dispatch_get_global_queue(0, 0), ^{
+//                            NSMutableArray *photoArr = [NSMutableArray array];
+//                            for (NSString *photoUrl in accountHome.photoUrlArray) {
+//                                NSData * data = [NSData dataWithContentsOfURL:[NSURL URLWithString:photoUrl]];
+//                                [photoArr addObject:[UIImage imageWithData:data]];
+//                            }
+//                            CYLog(@"同步云端相册成功");
+//                            imageModel.photosArr = photoArr;
+//                            [SHImageTool saveImageModel:imageModel];
+//                        });
+//                    }
+//                    [SHImageTool saveImageModel:imageModel];
+//                    [SHAccountTool saveAccount:accountHome];
+//                    CYLog(@"同步首页数据成功");
+//                    [CYAccountTool saveAccount:weakSelf.cyAccount];
+//                    if (weakSelf.cyAccount.otherUserName) {
+//                        AVQuery *query = [CYAccount query];
+//                        [query whereKey:@"userName" equalTo:weakSelf.cyAccount.otherUserName];
+//                        [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+//                            if (!error) {
+//                                CYAccount *otherAccount = [objects objectAtIndex:0];
+//                                [CYOtherAccountTool saveOtherAccount:otherAccount];
+//                            }
+//                        }];
+//                    }
+//                }];
+//            }
+//        }];
+        
+        [[SHHTTPManager shareHTTPManager] synchronizationAccountWithCyAccount:self.cyAccount];
+    }
+    [CDChatManager manager].userDelegate = [[SHUserFactory alloc]init];
+    
     [self.window makeKeyAndVisible];
     [CYRootTool setRootViewController];
-
-    //不要删我,我是特别牛逼的3D Touch
-    UIApplicationShortcutItem *shortItem1 = [[UIApplicationShortcutItem alloc] initWithType:@"Title1" localizedTitle:@"强" localizedSubtitle:@"测试中" icon:[UIApplicationShortcutIcon iconWithType:UIApplicationShortcutIconTypeSearch] userInfo:nil];
-    
-    UIApplicationShortcutItem *shortItem2 = [[UIApplicationShortcutItem alloc] initWithType:@"Title2" localizedTitle:@"哥" localizedSubtitle:@"不能点" icon:[UIApplicationShortcutIcon iconWithType:UIApplicationShortcutIconTypeAdd] userInfo:nil];
-    
-    UIApplicationShortcutItem *shortItem3 = [[UIApplicationShortcutItem alloc] initWithType:@"Title3" localizedTitle:@"最" localizedSubtitle:@"别点" icon:[UIApplicationShortcutIcon iconWithType:UIApplicationShortcutIconTypeLocation] userInfo:nil];
-    
-    UIApplicationShortcutItem *shortItem4 = [[UIApplicationShortcutItem alloc] initWithType:@"Title4" localizedTitle:@"帅" localizedSubtitle:@"点了啥也没有" icon:[UIApplicationShortcutIcon iconWithType:UIApplicationShortcutIconTypeLocation] userInfo:nil];
-    
-    NSArray *shortItems = [[NSArray alloc] initWithObjects:shortItem1, shortItem2,shortItem3,shortItem4, nil];
-    NSLog(@"%@", shortItems);
-    [[UIApplication sharedApplication] setShortcutItems:shortItems];
 
     return YES;
 }

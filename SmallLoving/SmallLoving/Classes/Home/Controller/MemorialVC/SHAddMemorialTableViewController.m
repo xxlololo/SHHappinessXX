@@ -11,6 +11,9 @@
 #import "SHMenstruationTableViewCell.h"
 #import "SHAccountTool.h"
 #import "SHMemorialModel.h"
+#import "CYAccountTool.h"
+#import "CYAccount.h"
+#import <MJExtension.h>
 
 @interface SHAddMemorialTableViewController ()
 @property (nonatomic, strong) NSIndexPath *selectedIndexPath;
@@ -26,6 +29,13 @@
     [self.tableView registerNib:[UINib nibWithNibName:@"SHMenstruationTableViewCell" bundle:nil] forCellReuseIdentifier:@"cell1"];
     self.tableView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1];
     self.tableView.contentInset = UIEdgeInsetsMake(50, 0, 0, 0);
+    
+    UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(keyboardHide:)];
+    //设置成NO表示当前控件响应后会传播到其他控件上，默认为YES。
+    tapGestureRecognizer.cancelsTouchesInView = NO;
+    //将触摸事件添加到当前view
+    [self.tableView addGestureRecognizer:tapGestureRecognizer];
+
     
 //    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     UIView *footerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, kScreenW, 100)];
@@ -48,6 +58,10 @@
     [self setNavigationBar];
 }
 
+-(void)keyboardHide:(UITapGestureRecognizer*)tap{
+    [self.view endEditing:YES];
+}
+
 - (void)deleteButtonAction:(UIButton *)btn{
     __weak typeof(self) weakSelf = self;
     UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
@@ -63,6 +77,21 @@
         [memorialArr removeObjectAtIndex:weakSelf.indexRow.intValue];
         accountHome.memorialArray = memorialArr;
         //存储到沙盒
+        CYAccount *cyAccount = [CYAccountTool account];
+        //上传到云端
+        if (cyAccount.accountHomeObjID) {
+            AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"SHAccountHome" objectId:cyAccount.accountHomeObjID];
+            [accountAV setObject:accountHome.mj_keyValues forKey:@"accountHome"];
+            [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    //存储到本地
+                    CYLog(@"存储纪念日信息成功");
+                    //存储到沙盒
+                    [SHAccountTool saveAccount:accountHome];
+                }
+            }];
+        }
+
         [SHAccountTool saveAccount:accountHome];
         [weakSelf.navigationController popViewControllerAnimated:YES];
     }];
@@ -71,7 +100,6 @@
     [alertVC addAction:confirm];
     
     [self presentViewController:alertVC animated:YES completion:nil];
-
 }
 
 //设置导航栏
@@ -103,7 +131,10 @@
     SHAccountHome *accountHome = [SHAccountTool account];
     NSMutableArray *memorialArr = [NSMutableArray arrayWithArray:accountHome.memorialArray];
     SHMemorialModel *memorialModel = [[SHMemorialModel alloc] init];
-    memorialModel.memorialDate = dateCell.datePicker.date;
+    NSDateFormatter *formatter =[[NSDateFormatter alloc] init];
+    formatter.dateFormat = @"yyyy-MM-dd";
+
+    memorialModel.memorialDate = [formatter stringFromDate:dateCell.datePicker.date];
     if ([self.indexRow isEqualToString:@"0"] || !accountHome.memorialArray) {
         memorialModel.memorialName = nameCell.nameLabel.text;
     }else{
@@ -116,6 +147,20 @@
     }
     accountHome.memorialArray = memorialArr;
     //存储到沙盒
+    CYAccount *cyAccount = [CYAccountTool account];
+    //上传到云端
+    if (cyAccount.accountHomeObjID) {
+        AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"SHAccountHome" objectId:cyAccount.accountHomeObjID];
+        [accountAV setObject:accountHome.mj_keyValues forKey:@"accountHome"];
+        [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+            if (succeeded) {
+                //存储到本地
+                CYLog(@"存储纪念日信息成功");
+                //存储到沙盒
+                [SHAccountTool saveAccount:accountHome];
+            }
+        }];
+    }
     [SHAccountTool saveAccount:accountHome];
     [self.navigationController popViewControllerAnimated:YES];
 }
@@ -176,7 +221,7 @@
             NSString *timestamp = [formatter stringFromDate:self.tempDate];
             cell.leftLabel.text = timestamp;
         } else if(self.indexRow) {
-            NSString *timestamp = [formatter stringFromDate:memorialModel.memorialDate];
+            NSString *timestamp = memorialModel.memorialDate;
             cell.leftLabel.text = timestamp;
         } else {
             NSString *timestamp = [formatter stringFromDate:[NSDate date]];
@@ -190,7 +235,7 @@
             if (self.tempDate) {
                 cell.datePicker.date = self.tempDate;
             } else if(self.indexRow) {
-                cell.datePicker.date = memorialModel.memorialDate;
+                cell.datePicker.date = [formatter dateFromString:memorialModel.memorialDate];
             } else {
                 cell.datePicker.date = [NSDate date];
             }
@@ -225,6 +270,5 @@
     }
     return 44;
 }
-
 
 @end

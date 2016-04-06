@@ -11,6 +11,12 @@
 
 @implementation SHAccountHome
 
++ (NSDictionary *)objectClassInArray
+{
+    return @{
+             @"memorialArray" : @"SHMemorialModel"
+             };
+}
 
 //归档 序列化 压缩
 - (void)encodeWithCoder:(NSCoder *)aCoder{

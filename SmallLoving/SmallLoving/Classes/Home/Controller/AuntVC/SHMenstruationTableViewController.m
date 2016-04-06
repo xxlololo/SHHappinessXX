@@ -13,6 +13,9 @@
 #import "SHSexViewController.h"
 #import "SHAccountHome.h"
 #import "SHAccountTool.h"
+#import "CYAccountTool.h"
+#import "CYAccount.h"
+#import <MJExtension.h>
 
 
 @interface SHMenstruationTableViewController ()<UIPickerViewDataSource,UIPickerViewDelegate>
@@ -48,8 +51,8 @@
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     //获取账户信息
-    SHAccountHome *accountHome = [SHAccountTool account];
-    if ([accountHome.sex isEqualToString:@"m"]) {
+    CYAccount *cyAccount = [CYAccountTool account];
+    if ([cyAccount.sex isEqualToString:@"m"]) {
         [self.navigationController popViewControllerAnimated:YES];
     }
 }
@@ -59,21 +62,32 @@
     CYAlertAction *actionCamera = [CYAlertAction actionWithTitle:@"确定" handler:^(UIAlertAction *action) {
         //获取账户信息
         SHAccountHome *accountHome = [SHAccountTool account];
-        NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
-        //设置日期格式(声明字符串里面每个数字和单词的含义)
-        fmt.dateFormat = @"yyyy-MM-dd";
+        
         //上次姨妈时间cell
         SHMenstruationTableViewCell *dateCell = self.tableView.visibleCells[0];
         //设置上次姨妈时间
-        accountHome.lastAuntDate = [fmt dateFromString:dateCell.rightLabel.text];
+        accountHome.lastAuntDate = dateCell.rightLabel.text;
         
         //姨妈间隔cell
         SHMenstruationTableViewCell *intervalCell = self.tableView.visibleCells[1];
         //设置姨妈间隔时间
         accountHome.interval = [intervalCell.rightLabel.text substringToIndex:2];
         //存储到沙盒
+        CYAccount *cyAccount = [CYAccountTool account];
+        //上传到云端
+        if (cyAccount.accountHomeObjID) {
+            AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"SHAccountHome" objectId:cyAccount.accountHomeObjID];
+            [accountAV setObject:accountHome.mj_keyValues forKey:@"accountHome"];
+            [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    //存储到本地
+                    CYLog(@"存储姨妈信息成功");
+                    //存储到沙盒
+                    [SHAccountTool saveAccount:accountHome];
+                }
+            }];
+        }
         [SHAccountTool saveAccount:accountHome];
-        
         [self.navigationController popViewControllerAnimated:YES];
     }];
     alertVC.allActions = @[actionCamera];
@@ -105,14 +119,16 @@
 
 - (void)dateChanged:(id)sender {
     SHMenstruationTableViewCell *dateCell = self.tableView.visibleCells[0];
+    SHMenstruationTableViewCell *intervalCell = self.tableView.visibleCells[1];
     //获取日期
     NSDateFormatter *formatter =[[NSDateFormatter alloc] init];
-    formatter.dateFormat = @"YYYY-MM-dd";
+    formatter.dateFormat =  @"yyyy-MM-dd";
     NSString *timestamp = [formatter stringFromDate:dateCell.datePicker.date];
     dateCell.rightLabel.text = timestamp;
     //获取账户信息
     SHAccountHome *accountHome = [SHAccountTool account];
-    accountHome.lastAuntDate = dateCell.datePicker.date;
+    accountHome.lastAuntDate = [formatter stringFromDate:dateCell.datePicker.date];
+    accountHome.interval = [intervalCell.rightLabel.text substringToIndex:2];
     //存储到沙盒
     [SHAccountTool saveAccount:accountHome];
 }
@@ -149,7 +165,7 @@
     
     //获取日期
     NSDateFormatter *formatter =[[NSDateFormatter alloc] init];
-    formatter.dateFormat = @"YYYY-MM-dd";
+    formatter.dateFormat =  @"yyyy-MM-dd";
     if (indexPath.row == 0) {
         cell.leftImageView.image = [UIImage imageNamed:@"menses-recent-icon"];
         cell.leftLabel.text = @"上一次来姨妈";
@@ -157,13 +173,13 @@
             NSString *timestamp = [formatter stringFromDate:[NSDate date]];
             cell.rightLabel.text = timestamp;
         } else {
-            NSString *timestamp = [formatter stringFromDate:accountHome.lastAuntDate];
+            NSString *timestamp = accountHome.lastAuntDate;
             cell.rightLabel.text = timestamp;
         }
         if (indexPath == self.selectedIndexPath) {
             [cell.datePicker addTarget:self action:@selector(dateChanged:) forControlEvents:UIControlEventValueChanged];
             if (accountHome.lastAuntDate) {
-                cell.datePicker.date = accountHome.lastAuntDate;
+                cell.datePicker.date = [formatter dateFromString:accountHome.lastAuntDate];
             }else{
                 cell.datePicker.date = [NSDate date];
             }
@@ -236,7 +252,7 @@
     intervalCell.rightLabel.text = [NSString stringWithFormat:@"%@天",[self.dayArray objectAtIndex:row]];
     //获取账户信息
     SHAccountHome *accountHome = [SHAccountTool account];
-    accountHome.interval = [NSString stringWithFormat:@"%@天",[self.dayArray objectAtIndex:row]];
+    accountHome.interval = [self.dayArray objectAtIndex:row];
     //存储到沙盒
     [SHAccountTool saveAccount:accountHome];
 }

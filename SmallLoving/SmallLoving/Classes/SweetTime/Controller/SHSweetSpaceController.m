@@ -7,73 +7,46 @@
 
 
 #import "SHSweetSpaceController.h"
-#import "SHSweetSpaceItem.h"
 #import "SHSpaceCell.h"
-#import "SHCellFrameItem.h"
-#import "THEditPhotoView.h"
 #import "SHPostMoodController.h"
-#import "SHImageFrame.h"
-#import "SHSingleArray.h"
-#import "SHFMDB.h"
+#import "CYAccountTool.h"
+#import "CYAccount.h"
+#import <UIImageView+WebCache.h>
+#import "SHImageTool.h"
+#import <MJRefresh.h>
+
 #define kScreenWith [UIScreen mainScreen].bounds.size.width
 #define kScreenHeight [UIScreen mainScreen].bounds.size.height
 @interface SHSweetSpaceController ()<UITableViewDelegate, UITableViewDataSource>
+@property(nonatomic, strong)NSMutableArray *spaceArray;
 
-/**
- 
- *  存放所有cell的frame
- */
-@property (nonatomic,strong)NSMutableArray *frameArr;
-@property (strong, nonatomic) CADisplayLink *displayLink;
-@property (nonatomic,strong)THEditPhotoView *editPhotoView;
-@property (nonatomic,strong)SHImageFrame *imageFrame ;
-@property (nonatomic,strong)SHSingleArray *singleArray;
-@property (nonatomic,strong)SHSweetSpaceItem *spaceItem;
 @end
 
 @implementation SHSweetSpaceController
-- (NSMutableArray *)pictureArr{
-    if (!_pictureArr) {
-        _pictureArr = [NSMutableArray array];
+- (NSMutableArray *)spaceArray{
+    if (!_spaceArray) {
+        _spaceArray = [NSMutableArray array];
     }
-    return _pictureArr ;
+    return _spaceArray;
 }
-- (NSMutableArray *)frameArr{
-    if (!_frameArr) {
-        _frameArr = [NSMutableArray array];
-    }
-    return _frameArr ;
-}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self layoutViews];
-    self.singleArray = [SHSingleArray shareSHSingArray];
-    [[SHFMDB sharedSHFMDB]openFMDB];
     UIView *llview = [[UIView alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, kScreenHeight*0.33+20)];
     //背景图片
     self.headerImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, kScreenWith, kScreenHeight*0.33)];
     self.headerImageView.image = [UIImage imageNamed:@"image0.png"];
     
-    //去掉背景图片
-    //    [self.navigationController.navigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
-    //去掉底部线条
-    //    [self.navigationController.navigationBar setShadowImage:[[UIImage alloc] init]];
     UIView *contentView = [[UIView alloc]initWithFrame:self.headerImageView.bounds];
     self.headerImageView.center = contentView.center ;
     contentView.layer.masksToBounds = YES ;
     self.headerContentView = contentView;
-    //添加背景view
-    //    CGRect backView_frame = CGRectMake(0, -20, kScreenWith, 64);
-    //    UIView *backView = [[UIView alloc] initWithFrame:backView_frame];
-    //    UIColor *backColor = [UIColor colorWithRed:0.2 green:0.6 blue:0.4 alpha:0];
-    //    backView.backgroundColor = [backColor colorWithAlphaComponent:0.3];
-    //    [self.navigationController.navigationBar addSubview:backView];
-    //    self.backView = backView;
-    //    self.backColor = backColor;
-    //用户名称
     self.label = [[UILabel alloc]initWithFrame:CGRectMake(0, self.headerContentView.bounds.size.height-30, kScreenWith-76, 30)];
+    CYAccount *cyAccount = [CYAccountTool account];
+    
     //调用数据库/leancloud中用户名称
-    self.label.text = @"小幸福";
+    self.label.text = cyAccount.nickName;
     self.label.textAlignment = NSTextAlignmentRight;
     self.label.textColor = [UIColor brownColor];
     self.label.backgroundColor = [UIColor clearColor];
@@ -84,8 +57,18 @@
 
     UIImageView *icon = [[UIImageView alloc] initWithFrame:icon_frame];
     icon.backgroundColor = [UIColor clearColor];
+    
     //调用用户图片
-    icon.image = [UIImage imageNamed:@"hero.png"];
+    SHImageModel *imageModel = [SHImageTool imageModel];
+    if (imageModel.iconImage) {
+        icon.image = imageModel.iconImage;
+    }else{
+        [icon sd_setImageWithURL:[NSURL URLWithString:cyAccount.iconURL] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+            imageModel.iconImage = icon.image;
+            [SHImageTool saveImageModel:imageModel];
+        }];
+    }
+    
     icon.layer.masksToBounds = YES;
     icon.layer.borderWidth = 3.0f;
     icon.layer.borderColor = [UIColor whiteColor].CGColor;
@@ -100,11 +83,14 @@
     self. tableView.separatorStyle = UITableViewCellSelectionStyleNone;
     self.automaticallyAdjustsScrollViewInsets = NO ;
     self.navigationController.navigationBar.translucent = NO;
-    //雪花效果
-//        self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(handleAction:)];
-//    
-//        [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
     
+    //注册cell
+    [self.tableView registerClass:[SHSpaceCell class] forCellReuseIdentifier:@"cell"];
+    
+    //下拉刷新
+    [self setupDownRefresh];
+    //上拉加载
+    [self setupUpRefresh];
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView{
@@ -147,77 +133,82 @@
     
 }
 
-- (void)viewDidAppear:(BOOL)animated{
-    [super viewDidAppear:animated];
-    self.tabBarController.tabBar.hidden = YES ;
-    self.imageFrame.arr = self.pictureArr;
-    [self.tableView reloadData];
-    
-}
-/**
- *删除说说的方法
--(UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath{
-    
-    return UITableViewCellEditingStyleDelete;
-}
-//改变删除按钮的title
-- (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath{
-    
-    return @"删除说说";
-}
-//删除用到的函数
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath{
-    
-    if (editingStyle==UITableViewCellEditingStyleDelete) {
-        [self.frameArr removeObjectAtIndex:indexPath.row];
-        [tableView deleteRowsAtIndexPaths:[NSMutableArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-        //        [[SHFMDB sharedSHFMDB]deleteWithTitle:self.frameArr[indexPath].cellFrame.cellItem.titleCopy context:self.frameArr[indexPath].cellFrame.cellItem.textCopy];
-        //
-    }
-}
-
- *
- */
-
 - (void)rightItemAction{
     //获取数据
     SHPostMoodController *postMood = [[SHPostMoodController alloc]init];
     
-    __weak typeof(self) weakSelf = self;
-    //给block属性 赋值
-    postMood.callValue = ^(NSString *titleCopy, NSString *textCopy,NSMutableArray *array){
-        weakSelf.titleCopy =titleCopy;
-        weakSelf.textCopy = textCopy;
-        weakSelf.pictureArr = array ;
-        self.singleArray.singleArr = array;
-        //创建SHCellframe模型
-        SHCellFrameItem *cellFrame = [[SHCellFrameItem alloc]init];
-        cellFrame.spaceItem = self.spaceItem;
-        [self.frameArr addObject:cellFrame];
-        //3.2添加模型对象到数组
-    };
     [self.navigationController pushViewController:postMood animated:YES];
     
 }
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    //初始化
-    NSArray *array =[[SHFMDB sharedSHFMDB]selectAllSpaceItem];
-    NSLog(@"第一次获取数据%@",array);
-    //3.将dictArray 里面的所有字典转换成模型,加到新的数组中
-    NSMutableArray *arr = [NSMutableArray array];
-    for (SHSweetSpaceItem *spaceItem in array) {
-        //3.1创建模型对象
-        //创建SHCellframe模型
-        SHCellFrameItem *cellFrame = [[SHCellFrameItem alloc]init];
-        cellFrame.spaceItem = spaceItem;
-        //3.2添加模型对象到数组
-        [arr addObject:cellFrame];
-    }
-    //4.赋值
-    self.frameArr = [NSMutableArray arrayWithArray:arr];
-    [self.tableView reloadData];
+    [self setupDownRefresh];
+    
 }
+
+
+//下拉刷新
+- (void)setupDownRefresh{
+    
+    MJRefreshNormalHeader * header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(refreshStateChangeDown)];
+    [header setTitle:@"下拉刷新" forState:MJRefreshStateIdle];
+    [header setTitle:@"释放刷新" forState:MJRefreshStatePulling];
+    [header setTitle:@"加载中..." forState:MJRefreshStateRefreshing];
+    header.lastUpdatedTimeLabel.hidden = YES;
+    //添加刷新控件
+    self.tableView.mj_header = header;
+    //马上进入刷新状态
+    [self.tableView.mj_header beginRefreshing];
+}
+
+- (void)refreshStateChangeDown{
+    
+    AVQuery *query = [AVQuery queryWithClassName:@"SweetTime"];
+    AVObject *objAV = self.spaceArray.firstObject;
+    if (objAV) {
+        NSDate *createdDate = [objAV objectForKey:@"createdAt"];
+        [query whereKey:@"createdAt" greaterThan:createdDate];
+    }
+    [query orderByDescending:@"createdAt"];
+    query.limit = 10; // 最多返回 10 条结果
+    __weak typeof(self) weakSelf = self;
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        
+        NSRange range = NSMakeRange(0, objects.count);
+        NSIndexSet *set = [NSIndexSet indexSetWithIndexesInRange:range];
+        [weakSelf.spaceArray insertObjects:objects atIndexes:set];
+        //结束刷新
+        [weakSelf.tableView.mj_header endRefreshing];
+        [weakSelf.tableView reloadData];
+    }];
+}
+
+//上拉加载
+- (void)setupUpRefresh{
+    self.tableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(refreshStateChangeUp)];
+}
+
+- (void)refreshStateChangeUp{
+    AVQuery *query = [AVQuery queryWithClassName:@"SweetTime"];
+    NSDate *createdDate = [self.spaceArray.lastObject objectForKey:@"createdAt"];
+    [query whereKey:@"createdAt" lessThan:createdDate];
+    [query orderByDescending:@"createdAt"];
+    query.limit = 10; // 最多返回 10 条结果
+    __weak typeof(self) weakSelf = self;
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        [weakSelf.spaceArray addObjectsFromArray:objects];
+        [weakSelf.tableView reloadData];
+        //结束刷新
+        [weakSelf.tableView.mj_footer endRefreshing];
+    }];
+
+}
+
+
+
+
+
+
 - (void)leftItemAction{
     
     [self.navigationController popViewControllerAnimated:YES];
@@ -233,66 +224,41 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     
-    return self.frameArr.count;
+    return self.spaceArray.count;
 }
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    AVObject *obj = self.spaceArray[indexPath.row];
+    NSString *titleString = [obj objectForKey:@"titleString"];//标题
+    NSString *textString = [obj objectForKey:@"textString"];//内容
+    NSString *iconURL = [obj objectForKey:@"iconURL"];//头像
+    NSString *nickName = [obj objectForKey:@"nickName"];//昵称
+    NSString *timestamp = [obj objectForKey:@"timestamp"];//时间
+
     //1.创建cell
-    SHSpaceCell *cell = [SHSpaceCell cellWithTableView:tableView];
-    //2.在这个方法中算出cell的高度
+    SHSpaceCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+    [cell.iconView sd_setImageWithURL:[NSURL URLWithString:iconURL]];
+    cell.nameView.text = nickName;
+    cell.titleView.text = titleString;
+    cell.textView.text = textString;
+    cell.dateView.text = timestamp;
+    
     //必须的
     cell.backgroundColor = [UIColor colorWithRed:(255)
                                            green:(255)  blue:(255) alpha:.4];
-    
-    cell.cellItem  = self.frameArr[indexPath.row];
     cell.selected = NO;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     //3.返回cell
     return cell;
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    //计算高度
-    //取出这行对应的frame模型
-    SHCellFrameItem *cellFrame = self.frameArr[indexPath.row];
-    return cellFrame.cellHeight;
+    AVObject *obj = self.spaceArray[indexPath.row];
+    NSString *textString = [obj objectForKey:@"textString"];//内容
+    CGFloat height = [SHSpaceCell heithtForLabelText:textString];
+    return height + 135;
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
     return 0.01;
-}
-/**
- *  获取雪花特效
- */
-- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
- [self.displayLink invalidate];
- self.displayLink = nil;
- }
- - (void)handleAction:(CADisplayLink *)displayLink{
- 
- UIImage *image = [UIImage imageNamed:@"雪花"];
- UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
- CGFloat scale = arc4random_uniform(60) / 100.0;
- imageView.transform = CGAffineTransformMakeScale(scale, scale);
- CGSize winSize = self.tableView.bounds.size;
- CGFloat x = arc4random_uniform(winSize.width);
- CGFloat y = - imageView.frame.size.height;
- imageView.center = CGPointMake(x, y);
- 
- [self.tableView addSubview:imageView];
- [UIView animateWithDuration:arc4random_uniform(10) animations:^{
- CGFloat toX = arc4random_uniform(winSize.width);
- CGFloat toY = imageView.frame.size.height * 0.5 + winSize.height;
- 
- imageView.center = CGPointMake(toX, toY);
- imageView.transform = CGAffineTransformRotate(imageView.transform, arc4random_uniform(M_PI * 2));
- 
- imageView.alpha = 0.5;
- } completion:^(BOOL finished) {
- [imageView removeFromSuperview];
- }];
- 
- 
- }
- 
-
+} 
 @end

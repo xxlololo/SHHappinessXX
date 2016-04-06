@@ -61,64 +61,64 @@
     return _titleLabel;
 }
 
-- (UIButton *)qqLoginBtn {
-    if (!_qqLoginBtn) {
-        UIButton * btn = [UIButton buttonWithType:(UIButtonTypeCustom)];
-        _qqLoginBtn = btn;
-        UIColor * color = [UIColor colorWithRed:64 / 255.0 green:190 / 255.0 blue:243 / 255.0 alpha:1];
-        [btn setBackgroundImage:[UIImage imageWithStretchableName:@"white-mask-common-btn"] forState:(UIControlStateNormal)];
-        [btn.layer setMasksToBounds:YES];
-        [btn.layer setCornerRadius:10];
-        [btn.layer setBorderWidth:1];
-        [btn.layer setBorderColor:color.CGColor];
-        [btn setTitle:@"QQ账号登录" forState:(UIControlStateNormal)];
-        [btn setTitleColor:color forState:(UIControlStateNormal)];
-        [btn setImage:[UIImage imageNamed:@"welcome-qq-icon"] forState:(UIControlStateNormal)];
-        btn.imageEdgeInsets = UIEdgeInsetsMake(0.0, -30, 0.0, 0.0);
-        btn.tintColor = color;
-        [self addSubview:btn];
-    }
-    return _qqLoginBtn;
-}
+//- (UIButton *)qqLoginBtn {
+//    if (!_qqLoginBtn) {
+//        UIButton * btn = [UIButton buttonWithType:(UIButtonTypeCustom)];
+//        _qqLoginBtn = btn;
+//        UIColor * color = [UIColor colorWithRed:64 / 255.0 green:190 / 255.0 blue:243 / 255.0 alpha:1];
+//        [btn setBackgroundImage:[UIImage imageWithStretchableName:@"white-mask-common-btn"] forState:(UIControlStateNormal)];
+//        [btn.layer setMasksToBounds:YES];
+//        [btn.layer setCornerRadius:10];
+//        [btn.layer setBorderWidth:1];
+//        [btn.layer setBorderColor:color.CGColor];
+//        [btn setTitle:@"QQ账号登录" forState:(UIControlStateNormal)];
+//        [btn setTitleColor:color forState:(UIControlStateNormal)];
+//        [btn setImage:[UIImage imageNamed:@"welcome-qq-icon"] forState:(UIControlStateNormal)];
+//        btn.imageEdgeInsets = UIEdgeInsetsMake(0.0, -30, 0.0, 0.0);
+//        btn.tintColor = color;
+//        [self addSubview:btn];
+//    }
+//    return _qqLoginBtn;
+//}
 
-- (UIButton *)weChatLoginBtn {
-    if (!_weChatLoginBtn) {
-        UIButton * btn = [UIButton buttonWithType:(UIButtonTypeCustom)];
-        _weChatLoginBtn = btn;
-        [btn setBackgroundImage:[UIImage imageWithStretchableName:@"white-mask-common-btn"] forState:(UIControlStateNormal)];
-        UIColor * color = [UIColor colorWithRed:135 / 255.0 green:199 / 255.0 blue:16 / 255.0 alpha:1];
-        [btn.layer setMasksToBounds:YES];
-        [btn.layer setCornerRadius:10];
-        [btn.layer setBorderWidth:1];
-        [btn.layer setBorderColor:color.CGColor];
-        [btn setTitle:@"微信登录" forState:(UIControlStateNormal)];
-        [btn setTitleColor:color forState:(UIControlStateNormal)];
-        UIImage * img = [[UIImage imageNamed:@"welcome-wechat-icon"] imageColor:color];
-        [btn setImage:img forState:(UIControlStateNormal)];
-        btn.imageEdgeInsets = UIEdgeInsetsMake(0.0, -20, 0.0, 0.0);
-        [self addSubview:btn];
-    }
-    return _weChatLoginBtn;
-}
+//- (UIButton *)weChatLoginBtn {
+//    if (!_weChatLoginBtn) {
+//        UIButton * btn = [UIButton buttonWithType:(UIButtonTypeCustom)];
+//        _weChatLoginBtn = btn;
+//        [btn setBackgroundImage:[UIImage imageWithStretchableName:@"white-mask-common-btn"] forState:(UIControlStateNormal)];
+//        UIColor * color = [UIColor colorWithRed:135 / 255.0 green:199 / 255.0 blue:16 / 255.0 alpha:1];
+//        [btn.layer setMasksToBounds:YES];
+//        [btn.layer setCornerRadius:10];
+//        [btn.layer setBorderWidth:1];
+//        [btn.layer setBorderColor:color.CGColor];
+//        [btn setTitle:@"微信登录" forState:(UIControlStateNormal)];
+//        [btn setTitleColor:color forState:(UIControlStateNormal)];
+//        UIImage * img = [[UIImage imageNamed:@"welcome-wechat-icon"] imageColor:color];
+//        [btn setImage:img forState:(UIControlStateNormal)];
+//        btn.imageEdgeInsets = UIEdgeInsetsMake(0.0, -20, 0.0, 0.0);
+//        [self addSubview:btn];
+//    }
+//    return _weChatLoginBtn;
+//}
 
-- (UIButton *)weiBoLoginBtn {
-    if (!_weiBoLoginBtn) {
-        UIButton * btn = [UIButton buttonWithType:(UIButtonTypeCustom)];
-        _weiBoLoginBtn = btn;
-        [btn setBackgroundImage:[UIImage imageWithStretchableName:@"white-mask-common-btn"] forState:(UIControlStateNormal)];
-        UIColor * color = [UIColor colorWithRed:218 / 255.0 green:55 / 255.0 blue:42 / 255.0 alpha:1];
-        [btn.layer setMasksToBounds:YES];
-        [btn.layer setCornerRadius:10];
-        [btn.layer setBorderWidth:1];
-        [btn.layer setBorderColor:color.CGColor];
-        [btn setTitle:@"微博登录" forState:(UIControlStateNormal)];
-        [btn setTitleColor:color forState:(UIControlStateNormal)];
-        [btn setImage:[UIImage imageNamed:@"welcome-sina-icon"] forState:(UIControlStateNormal)];
-        btn.imageEdgeInsets = UIEdgeInsetsMake(0.0, -20, 0.0, 0.0);
-        [self addSubview:btn];
-    }
-    return _weiBoLoginBtn;
-}
+//- (UIButton *)weiBoLoginBtn {
+//    if (!_weiBoLoginBtn) {
+//        UIButton * btn = [UIButton buttonWithType:(UIButtonTypeCustom)];
+//        _weiBoLoginBtn = btn;
+//        [btn setBackgroundImage:[UIImage imageWithStretchableName:@"white-mask-common-btn"] forState:(UIControlStateNormal)];
+//        UIColor * color = [UIColor colorWithRed:218 / 255.0 green:55 / 255.0 blue:42 / 255.0 alpha:1];
+//        [btn.layer setMasksToBounds:YES];
+//        [btn.layer setCornerRadius:10];
+//        [btn.layer setBorderWidth:1];
+//        [btn.layer setBorderColor:color.CGColor];
+//        [btn setTitle:@"微博登录" forState:(UIControlStateNormal)];
+//        [btn setTitleColor:color forState:(UIControlStateNormal)];
+//        [btn setImage:[UIImage imageNamed:@"welcome-sina-icon"] forState:(UIControlStateNormal)];
+//        btn.imageEdgeInsets = UIEdgeInsetsMake(0.0, -20, 0.0, 0.0);
+//        [self addSubview:btn];
+//    }
+//    return _weiBoLoginBtn;
+//}
 
 - (UIButton *)loginBtn {
     if (!_loginBtn) {
@@ -126,7 +126,7 @@
         _loginBtn = btn;
         [btn setBackgroundImage:[UIImage imageWithStretchableName:@"white-mask-common-btn"] forState:(UIControlStateNormal)];
         [btn setTitle:@"登录" forState:(UIControlStateNormal)];
-        UIColor * color = [UIColor colorWithWhite:0.4 alpha:1];
+        UIColor * color = [UIColor colorWithRed:64 / 255.0 green:190 / 255.0 blue:243 / 255.0 alpha:1];
         [btn setTitleColor:color forState:(UIControlStateNormal)];
         [btn.layer setMasksToBounds:YES];
         [btn.layer setCornerRadius:10];
@@ -143,7 +143,7 @@
         _registBtn = btn;
         [btn setBackgroundImage:[UIImage imageWithStretchableName:@"white-mask-common-btn"] forState:(UIControlStateNormal)];
         [btn setTitle:@"手机注册" forState:(UIControlStateNormal)];
-        UIColor *  color = [UIColor colorWithWhite:0.4 alpha:1];
+        UIColor * color = [UIColor colorWithRed:135 / 255.0 green:199 / 255.0 blue:16 / 255.0 alpha:1];
         [btn setTitleColor:color forState:(UIControlStateNormal)];
         [btn.layer setMasksToBounds:YES];
         [btn.layer setCornerRadius:10];
@@ -168,31 +168,35 @@
     [self.titleLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.center.equalTo(self.bgView).mas_offset(CGPointMake(0, 70));
     }];
-    [self.qqLoginBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+//    [self.qqLoginBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.equalTo(self.bgView.mas_bottom).offset(50);
+//        make.left.equalTo(self).offset(30);
+//        make.right.equalTo(self).offset(-30);
+//        make.height.mas_equalTo(50);
+//    }];
+//    [self.weChatLoginBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.equalTo(self.qqLoginBtn.mas_bottom).offset(10);
+//        make.left.equalTo(self.qqLoginBtn);
+//        make.height.equalTo(self.qqLoginBtn);
+//    }];
+//    [self.weiBoLoginBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.equalTo(self.weChatLoginBtn);
+//        make.right.equalTo(self.qqLoginBtn);
+//        make.width.equalTo(self.weChatLoginBtn);
+//        make.left.equalTo(self.weChatLoginBtn.mas_right).offset(10);
+//        make.height.equalTo(self.weChatLoginBtn);
+//    }];
+    [self.loginBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(self.bgView.mas_bottom).offset(50);
         make.left.equalTo(self).offset(30);
         make.right.equalTo(self).offset(-30);
         make.height.mas_equalTo(50);
     }];
-    [self.weChatLoginBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.qqLoginBtn.mas_bottom).offset(10);
-        make.left.equalTo(self.qqLoginBtn);
-        make.height.equalTo(self.qqLoginBtn);
-    }];
-    [self.weiBoLoginBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.weChatLoginBtn);
-        make.right.equalTo(self.qqLoginBtn);
-        make.width.equalTo(self.weChatLoginBtn);
-        make.left.equalTo(self.weChatLoginBtn.mas_right).offset(10);
-        make.height.equalTo(self.weChatLoginBtn);
-    }];
-    [self.loginBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.right.width.height.equalTo(self.weChatLoginBtn);
-        make.top.equalTo(self.weChatLoginBtn.mas_bottom).offset(10);
-    }];
     [self.registBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.right.width.height.equalTo(self.weiBoLoginBtn);
-        make.top.equalTo(self.loginBtn);
+        make.top.equalTo(self.loginBtn.mas_bottom).offset(10);
+        make.left.equalTo(self.loginBtn);
+        make.height.equalTo(self.loginBtn);
+        make.width.equalTo(self.loginBtn);
     }];
 }
 

@@ -9,5 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface SHMyViewController : UIViewController
+@property(nonatomic, strong)NSString *nickName;
+@property(nonatomic, strong)UIImage *iconImage;
 
 @end

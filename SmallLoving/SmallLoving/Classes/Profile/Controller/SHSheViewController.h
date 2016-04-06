@@ -9,5 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface SHSheViewController : UIViewController
+@property(nonatomic, strong)UIImage *sheIconImage;
 
 @end

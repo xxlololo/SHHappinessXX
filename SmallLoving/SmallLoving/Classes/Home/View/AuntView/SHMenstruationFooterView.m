@@ -42,7 +42,7 @@
         make.top.equalTo(self).offset(20);
         make.height.mas_equalTo(30);
     }];
-    [self.firstButton setBackgroundImage:[UIImage imageNamed:@"search-green-btn"] forState:UIControlStateNormal];
+    [self.firstButton setBackgroundImage:[UIImage imageNamed:@"forum-advert-download-btn"] forState:UIControlStateNormal];
     [self.firstButton setTitle:@"保存" forState:UIControlStateNormal];
     
     [self.secondButton mas_makeConstraints:^(MASConstraintMaker *make) {

@@ -505,6 +505,7 @@ static CGPoint  delayOffset = {0.0};
     // 初始化message tableView
     XHMessageTableView *messageTableView = [[XHMessageTableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
     messageTableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    messageTableView.showsVerticalScrollIndicator = NO;
     messageTableView.dataSource = self;
     messageTableView.delegate = self;
     messageTableView.separatorColor = [UIColor clearColor];
@@ -607,6 +608,7 @@ static CGPoint  delayOffset = {0.0};
         [weakSelf.messageInputView.inputTextView resignFirstResponder];
     };
     
+    self.messageTableView.contentInset = UIEdgeInsetsMake(-44, 0, 44, 0);
     // 初始化输入工具条
     XHMessageInputView *inputView = [[XHMessageInputView alloc] initWithFrame:inputFrame];
     inputView.allowsSendFace = self.allowsSendFace;
@@ -660,6 +662,8 @@ static CGPoint  delayOffset = {0.0};
     // Do any additional setup after loading the view.
     // 初始化消息页面布局
     [self initilzer];
+    self.automaticallyAdjustsScrollViewInsets = NO;
+    
     [[XHMessageBubbleView appearance] setFont:[UIFont systemFontOfSize:16.0f]];
 }
 

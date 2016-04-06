@@ -10,6 +10,14 @@
 #import "SHLeftBackButton.h"
 #import "SHNameController.h"
 #import "SHNumController.h"
+#import "CYAccount.h"
+#import "CYAccountTool.h"
+#import <UIImageView+WebCache.h>
+#import "SHImageTool.h"
+#import "SHIconTableViewCell.h"
+#import "SHNickNameTableViewCell.h"
+#import <UIImageView+WebCache.h>
+
 @interface SHMyViewController ()<UITableViewDataSource,UITableViewDelegate,UIScrollViewDelegate,UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 @property(nonatomic,strong)UITableView *tableview;
 @property(nonatomic,strong)UILabel *label1;
@@ -30,7 +38,8 @@
     [self.view addSubview:self.tableview];
 
     
-    [self.tableview registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
+    [self.tableview registerClass:[SHNickNameTableViewCell class] forCellReuseIdentifier:@"cell"];
+    [self.tableview registerClass:[SHIconTableViewCell class] forCellReuseIdentifier:@"cell1"];
     
     self.tableview.delegate=self;
     self.tableview.dataSource=self;
@@ -44,6 +53,11 @@
     self.navigationItem.leftBarButtonItem = leftItem;
     
 }
+
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    [self.tableview reloadData];
+}
 - (void)leftItemAction:(UIBarButtonItem *)leftItem{
     [self.navigationController popViewControllerAnimated:YES];
 }
@@ -56,7 +70,7 @@
 
 //设置每个分组下tableview的行数
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return 3;
+    return 2;
 }
 //每个分组上边预留的空白高度
 -(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
@@ -73,45 +87,27 @@
 }
 
 //设置每行对应的cell（展示的内容）
--(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    UITableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    CYAccount *cyAccount = [CYAccountTool account];
+    SHImageModel *imageModel = [SHImageTool imageModel];
     
     if (indexPath.section==0 && indexPath.row==0) {
-        UILabel *labelpic = [[UILabel alloc]initWithFrame:CGRectMake(10, 25, 100, 30)];
-        labelpic.text = @"头像";
-        [cell addSubview:labelpic];
+        SHIconTableViewCell *iconCell = [tableView dequeueReusableCellWithIdentifier:@"cell1"];
         //自己的头像
-        UIImageView *image1 = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"menses-gender-man"]];
-        image1.frame = CGRectMake(kScreenW-100, 5, 70, 70);
-        _image = image1;
-        [cell addSubview:image1];
+        [iconCell.iconImageView sd_setImageWithURL:[NSURL URLWithString:cyAccount.iconURL] placeholderImage:self.iconImage completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+            imageModel.iconImage = iconCell.iconImageView.image;
+            [SHImageTool saveImageModel:imageModel];
+        }];
+        return iconCell;
     }
     
     if(indexPath.section == 0 && indexPath.row == 1){
-        UILabel *labelname = [[UILabel alloc]initWithFrame:CGRectMake(10, 5, 100, 30)];
-        labelname.text = @"昵称";
-        [cell addSubview:labelname];
+        SHNickNameTableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
         //自己的昵称
-        UILabel *labelnamenew = [[UILabel alloc]initWithFrame:CGRectMake(kScreenW-230, 5, 200, 30)];
-        labelnamenew.text = @"测试";
-        labelnamenew.textAlignment = NSTextAlignmentRight;
-        _label1 = labelnamenew;
-        [cell addSubview:labelnamenew];
+        cell.nickNameLabel.text = cyAccount.nickName;
+        return cell;
     }
-    
-    if(indexPath.section == 0 && indexPath.row == 2){
-        UILabel *labelnum = [[UILabel alloc]initWithFrame:CGRectMake(10, 5, 100, 30)];
-        labelnum.text = @"恩爱号";
-        [cell addSubview:labelnum];
-        //自己的昵称
-        UILabel *labelnumnew = [[UILabel alloc]initWithFrame:CGRectMake(kScreenW-230, 5, 200, 30)];
-        labelnumnew.text = @"123456";
-        labelnumnew.textAlignment = NSTextAlignmentRight;
-        _label2 = labelnumnew;
-        [cell addSubview:labelnumnew];
-    }
-    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator; //显示最右边的箭头 
-    return cell;
+    return nil;
 }
 
 
@@ -123,10 +119,9 @@
         [self cameraBtnClick];
     }else if (indexPath.row == 1){
         SHNameController *nameVC = [SHNameController new];
+        SHNickNameTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+        nameVC.nickName = cell.nickNameLabel.text;
         [self.navigationController pushViewController:nameVC animated:YES];
-    }else if (indexPath.row == 2){
-        SHNumController *numVC = [SHNumController new];
-        [self.navigationController pushViewController:numVC animated:YES];
     }
 }
 //上传头像方法
@@ -195,7 +190,33 @@
     UIImage *image = info[UIImagePickerControllerOriginalImage];
     //添加图片到photosView中
     self.image.image = image;
+    //存储图片在本地沙盒中
+    SHImageModel *imageModel = [SHImageTool imageModel];
+    imageModel.iconImage = image;
+    
     //保存到沙盒上传到云端
-    //不会写
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        CYAccount *cyAccount = [CYAccountTool account];
+        NSData *imageData = UIImagePNGRepresentation(image);
+        AVFile *file = [AVFile fileWithName:@"image.png" data:imageData];
+        [file saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+            if (succeeded) {
+                cyAccount.iconURL = file.url;
+                //上传到云端
+                AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"CYAccount" objectId:cyAccount.objectId];
+                [accountAV setObject:cyAccount.iconURL forKey:@"iconURL"];
+                [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                    if (succeeded) {
+                        //存储到本地
+                        CYLog(@"存储头像成功");
+                        [CYAccountTool saveAccount:cyAccount];
+                        [SHImageTool saveImageModel:imageModel];
+                    }
+                }];
+            }
+        }];
+        [CYAccountTool saveAccount:cyAccount];
+        [SHImageTool saveImageModel:imageModel];
+    });
 }
 @end

@@ -8,30 +8,8 @@
 #define kNameFont [UIFont boldSystemFontOfSize:15]
 #define kTextFont [UIFont systemFontOfSize:14]
 #import "SHSpaceCell.h"
-#import "SHSweetSpaceItem.h"
-#import "SHCellFrameItem.h"
-#import "SHSingleArray.h"
-@interface SHSpaceCell()
-//1.头像
-@property (nonatomic,weak)UIImageView *iconView;
-//2.昵称
-@property (nonatomic,weak)UILabel *nameView;
-//3.会员图标
-@property (nonatomic,weak)UIImageView *vipView;
-//4.标题
-@property (nonatomic,weak)UILabel *titleView;
-//5.正文
-@property (nonatomic,weak)UILabel *textView;
-//6.配图
-@property (nonatomic,strong)UIView *pictureView;
-//7.cell之间的分割线
-@property (nonatomic,strong)UIView *cellView;
+#import <Masonry.h>
 
-@property (nonatomic,strong)UILabel *dateView;
-@property (nonatomic,strong)SHImageFrame *imageFrame;
-@property (nonatomic,strong)SHSingleArray *singleArray;
-
-@end
 @implementation SHSpaceCell
 
 //构造方法(在初始化对象的时候被调用)
@@ -48,10 +26,7 @@
         nameView.font = kNameFont;
         [self.contentView addSubview:nameView];
         self.nameView = nameView;
-        //3.会员图标
-        UIImageView *vipView = [[UIImageView alloc]init];
-        [self.contentView addSubview:vipView];
-        self.vipView = vipView;
+
         //4.标题
         UILabel *titleView = [[UILabel alloc]init];
         [self.contentView addSubview:titleView];
@@ -62,10 +37,6 @@
         textView.font = kTextFont;
         [self.contentView addSubview:textView];
         self.textView = textView ;
-        //6.配图
-        UIView *imageV = [[UIView alloc]init];
-        [self.contentView addSubview:imageV];
-        self.pictureView = imageV;
         //7.cell之间的分割线
         UIView *cellView = [[UIView alloc]init];
         [self.contentView addSubview:cellView];
@@ -74,112 +45,68 @@
         UILabel *dateView = [[UILabel alloc]init];
         [self.contentView addSubview:dateView];
         self.dateView = dateView;
-
         
+        [self allViews];
     }
     return self;
 }
-/**
- *  拿到模型数据,设置子控件的frame和显示数据
- *  重写模型属性的set方法
- */
 
--(void)setCellItem:(SHCellFrameItem *)cellItem{
-    _cellItem = cellItem;
-    //1.设置数据
-    [self settingData];
-    //2.设置frame
-    [self settingFrame];
-}
-+ (instancetype)cellWithTableView:(UITableView*)tableView{
-    static NSString *cell_id = @"cell_id";
-    SHSpaceCell *cell = [tableView dequeueReusableCellWithIdentifier:cell_id];
-    if (!cell) {
-        cell = [[SHSpaceCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cell_id];
-    }
-    return cell;
-}
-//设置数据
-- (void)settingData{
-    SHSweetSpaceItem *spaceItem = self.cellItem.spaceItem;
-    //1.头像
-    self.iconView.image = [UIImage imageNamed:spaceItem.icon];
-    //2.昵称
-    self.nameView.text = spaceItem.name;
-    //3.会员图标
-    if (spaceItem.vip) {
-        self.vipView.hidden = NO;
-        self.vipView.image = [UIImage imageNamed:@"vip-icon"];
-        self.nameView.textColor = [UIColor redColor];
-    }else{
-        self.nameView.textColor = [UIColor blackColor];
-        self.vipView.hidden = YES;
-    }
-    //4.title
-    self.titleView.text = spaceItem.titleText;
-    //4.正文
-    self.textView.text = spaceItem.text;
-    self.dateView.text = spaceItem.dateText;
-    //5.配图
-    if (spaceItem.picture) {//有配图
-        self.pictureView.hidden = NO;
-        int totalloc=3;
-        CGFloat appvieww=110;
-        CGFloat appviewh=120;
-        
-        CGFloat margin=([UIScreen mainScreen].bounds.size.width-totalloc*appvieww-20)/(totalloc+1);
-        self.singleArray = [SHSingleArray shareSHSingArray];
-        int count=(int)self.singleArray.singleArr.count;
-        for (int i=0; i<count; i++) {
-            int row=i/totalloc;//行号
-            //1/3=0,2/3=0,3/3=1;
-            int loc=i%totalloc;//列号
-            
-            CGFloat appviewx=margin+(margin+appvieww)*loc;
-            CGFloat appviewy=margin+(margin+appviewh)*row+70;
-            
-            
-            //创建uiview控件
-            UIView *appview=[[UIView alloc]initWithFrame:CGRectMake(appviewx, appviewy, appvieww, appviewh)];
-            appview.backgroundColor = [UIColor greenColor];
-            [self.pictureView addSubview:appview];
-            //创建uiview控件中的子视图
-            UIImageView *appimageview=[[UIImageView alloc]initWithFrame:CGRectMake(0, 0, appvieww, appviewh)];
-            //  UIImage *appimage=[UIImage imageNamed:self.arr[i]];
-            UIImage *appimage = self.singleArray.singleArr[i];
-            appimageview.image=appimage;
-            [appview addSubview:appimageview];
-        }
-    }else{
-        
-        self.pictureView.hidden = YES;
-    }
+- (void)allViews{
+    [self.iconView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.left.equalTo(self).offset(10);
+        make.size.mas_equalTo(CGSizeMake(50, 50));
+    }];
+    self.iconView.layer.cornerRadius = 25;
+    self.iconView.layer.masksToBounds = YES;
     
-    //cell之间的分割线
-    self.cellView.backgroundColor = [UIColor grayColor];
-    self.cellView.alpha = 0.6;
+    [self.nameView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(self.iconView);
+        make.left.equalTo(self.iconView.mas_right).offset(10);
+    }];
+    self.nameView.font = [UIFont systemFontOfSize:20];
+    
+    [self.dateView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.iconView.mas_bottom).offset(5);
+        make.left.equalTo(self.iconView);
+    }];
+    self.dateView.font = [UIFont systemFontOfSize:12];
+    self.dateView.textColor = [UIColor colorWithWhite:.6 alpha:1];
+
+    
+    [self.titleView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self).offset(10);
+        make.top.equalTo(self.dateView.mas_bottom).offset(10);
+    }];
+    self.titleView.font = [UIFont systemFontOfSize:20];
+    
+    [self.textView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.titleView.mas_bottom).offset(10);
+        make.left.equalTo(self.titleView);
+        make.right.equalTo(self.mas_right).offset(-10);
+    }];
+    self.textView.numberOfLines = 0;
+    self.textView.font = [UIFont systemFontOfSize:15];
+    self.textView.textColor = [UIColor colorWithWhite:0.3 alpha:1];
+    
+    [self.cellView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.textView.mas_bottom).offset(10);
+        make.left.equalTo(self.textView);
+        make.size.mas_equalTo(CGSizeMake(kScreenW-20,1));
+    }];
+    self.cellView.backgroundColor = SHColorCreater(231, 138, 157, 1);
 }
 
-- (void)settingFrame{
-    //1.头像
-    self.iconView.frame = self.cellItem.iconF;
-    //2.昵称
-    self.nameView.frame = self.cellItem.nameF;
-    //3.会员图标
-    self.vipView.frame =self.cellItem.vipF;
-    //4.title
-    self.titleView.frame = self.cellItem.titleF;
-    //4.正文
-    self.textView.frame = self.cellItem.textF;
-    //cellView
-    self.cellView.frame = self.cellItem.cellView;
-    //5.配图
-    if (self.cellItem.spaceItem.picture) {
-        //有配图
-        self.pictureView.frame = self.cellItem.pictureF;
-        
-    }
-    self.dateView.frame = self.cellItem.dataF ;
++ (CGFloat)heithtForLabelText:(NSString *)text{
+    //设置文本自适应高度
+    //size:设置自适应矩形框的size
+    //options:配置属性
+    //attributes配置文本相关的信息
+    //context:内容属性
+    //注意:设置的相关属性 和 显示控件的相关属性的设置保持一致
+    CGSize size = CGSizeMake(kScreenW-20, 1000);
+    NSDictionary *dic = @{NSFontAttributeName:[UIFont systemFontOfSize:15]};
+    CGRect rect = [text boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:dic context:nil];
+    return rect.size.height;
 }
 
 

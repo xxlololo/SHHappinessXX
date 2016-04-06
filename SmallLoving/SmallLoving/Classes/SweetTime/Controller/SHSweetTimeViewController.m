@@ -17,7 +17,7 @@
 - (NSArray *)data{
     if (_data ==nil) {
         _data = [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"sweetTime.plist" ofType:nil]];
-        NSLog(@"%@",_data);
+//        NSLog(@"%@",_data);
     }
     return  _data;
 }
@@ -55,10 +55,9 @@
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:ID];
     }
     NSDictionary *dict = self.data[indexPath.section][indexPath.row];
-    //设置图形为圆角
+    //设置图片
     UIImage *image = [UIImage imageNamed:dict[@"icon"]];
-    CGSize size = CGSizeMake(40, 40);
-    cell.imageView.image = [UIImage createRoundedRectImage:image size:size radius:10];
+    cell.imageView.image = image;
     
     //    cell.imageView.image = [UIImage imageNamed:dict[@"icon"]];
     cell.textLabel.text = dict[@"title"];

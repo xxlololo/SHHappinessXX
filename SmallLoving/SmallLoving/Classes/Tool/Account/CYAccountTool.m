@@ -16,6 +16,7 @@
 @implementation CYAccountTool
 
 + (void)saveAccount:(CYAccount *)account {
+    
     [NSKeyedArchiver archiveRootObject:account toFile:CYAccountPath];
 }
 

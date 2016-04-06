@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "MBProgressHUD.h"
 @interface SHProfileViewController : UIViewController
-
+@property (strong, nonatomic) MBProgressHUD *HUD;
+@property (assign, nonatomic) BOOL swichOpen;
 @end

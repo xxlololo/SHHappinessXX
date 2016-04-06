@@ -8,7 +8,6 @@
 
 #import "CYRegistViewController.h"
 #import "CYNavigationController.h"
-#import <AVOSCloud/AVOSCloud.h>
 #import "CYRegistView.h"
 #import "CYAccount.h"
 #import "CYAccountTool.h"

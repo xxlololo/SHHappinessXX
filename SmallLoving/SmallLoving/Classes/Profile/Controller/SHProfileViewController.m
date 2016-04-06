@@ -13,15 +13,20 @@
 #import "LCUserFeedbackAgent.h"
 #import "CYAccountTool.h"
 #import "CYRootTool.h"
+#import "CYAccount.h"
+#import <UIImageView+WebCache.h>
+#import "SHImageTool.h"
+#import "SHAccountTool.h"
+#import "SHMyProfileTableViewCell.h"
+#import "SHOtherSheTableViewCell.h"
+#import "CYOtherAccountTool.h"
+#import <CDChatManager.h>
 
 @interface SHProfileViewController ()<UITableViewDataSource,UITableViewDelegate>
 @property(nonatomic,strong)UITableView *tableview;
 @property(nonatomic,strong)NSArray *arr;
-@property(nonatomic,strong)UILabel * labelmy;
-@property(nonatomic,strong)UILabel * labelnumber;
-@property(nonatomic,strong)UILabel * labelshe;
-@property(nonatomic,strong)UIImageView *imagemy;
-@property(nonatomic,strong)UIImageView *imageshe;    //获取用户头像后赋值
+@property(nonatomic, strong)CYAccount *otherAccount;
+
 @end
 
 @implementation SHProfileViewController
@@ -32,18 +37,20 @@
     [self.view addSubview:self.tableview];
     
     [self.tableview registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
-    
+    [self.tableview registerClass:[SHMyProfileTableViewCell class] forCellReuseIdentifier:@"cell1"];
+    [self.tableview registerClass:[SHOtherSheTableViewCell class] forCellReuseIdentifier:@"cell2"];
     self.tableview.delegate=self;
     self.tableview.dataSource=self;
     self.tableview.bounces=NO;
     self.tableview.separatorStyle=UITableViewCellSeparatorStyleSingleLine;//分割线
-    self.arr=@[@"指纹解锁",@"清理缓存",@"意见反馈",@"关于小幸福"];
+    self.arr=@[@"清理缓存",@"意见反馈",@"关于小幸福"];
 }
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     [self.tableview reloadData];
 }
+
 -(void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
     self.tabBarController.tabBar.hidden = NO;
@@ -94,55 +101,65 @@
 
 //设置每行对应的cell（展示的内容）
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    //取出本地账户信息
+    CYAccount *cyAccount = [CYAccountTool account];
+    SHImageModel *imageModel = [SHImageTool imageModel];
+    
     UITableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
     
     if (indexPath.section==0) {
+        SHMyProfileTableViewCell *myCell = [tableView dequeueReusableCellWithIdentifier:@"cell1"];
         //后续加入判断男女,加载不同的默认头像
-        UIImageView *image1 = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"menses-gender-man"]];
-        image1.frame = CGRectMake(10, 5, 70, 70);
-        _imagemy = image1;
-        [cell addSubview:image1];
-        
-        UILabel *nameLabel=[[UILabel alloc]initWithFrame:CGRectMake(100, 7, kScreenW-120, 40)];
-        nameLabel.text= @"测试Label";
-        nameLabel.font = [UIFont boldSystemFontOfSize:22.0];
-        _labelmy = nameLabel;
-        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator; //显示最右边的箭头
-        [cell.contentView addSubview:nameLabel];
-        
-        UILabel *happinessnumber = [[UILabel alloc]initWithFrame:CGRectMake(100, 45, 50, 30)];
-        happinessnumber.text = @"恩爱号:";
-        happinessnumber.font = [UIFont boldSystemFontOfSize:14.0];
-        [cell.contentView addSubview:happinessnumber];
-        
-        UILabel *number = [[UILabel alloc]initWithFrame:CGRectMake(150, 45, kScreenW-170, 30)];
-        number.text = @"1234567";
-        number.font = [UIFont boldSystemFontOfSize:14.0];
-        _labelnumber = nameLabel;
-        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator; //显示最右边的箭头
-        [cell.contentView addSubview:number];
-
-    }else if (indexPath.section==1){
-        UIImageView *image2 = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"menses-gender-woman"]];
-        image2.frame = CGRectMake(10, 2, 36, 36);
-        _imageshe = image2;
-        [cell addSubview:image2];
-        UILabel *sheLabel=[[UILabel alloc]initWithFrame:CGRectMake(60, 0, 200, 40)];
-        sheLabel.text= @"另一半账户";
-        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator; //显示最右边的箭头
-        [cell.contentView addSubview:sheLabel];
-    }else if (indexPath.section==2) {
-        if (indexPath.row==0) {
-            UISwitch *switchButton = [[UISwitch alloc] initWithFrame:CGRectMake(kScreenW-60, 5, 50, 20)];
-            [switchButton setOn:YES];
-            [switchButton addTarget:self action:@selector(switchAction:) forControlEvents:UIControlEventValueChanged];
-            switchButton.on = NO;
-            [cell.contentView addSubview:switchButton];
+        if (imageModel.iconImage) {
+            myCell.iconImage.image = imageModel.iconImage;
         }else{
-            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator; //显示最右边的箭头
+            [myCell.iconImage sd_setImageWithURL:[NSURL URLWithString:cyAccount.iconURL] placeholderImage:[UIImage imageNamed:@"menses-gender-man"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+                if (!error) {
+                    imageModel.iconImage = image;
+                    [SHImageTool saveImageModel:imageModel];
+                }
+            }];
         }
         
+        if (cyAccount.nickName) {
+            myCell.nickNameLabel.text = cyAccount.nickName;
+        }else{
+            myCell.nickNameLabel.text= @"请设置昵称";
+        }
+
+        myCell.loveNumLabel.text = [NSString stringWithFormat:@"幸福号:%@",cyAccount.userName];
+        return myCell;
+    }else if (indexPath.section==1){
+        SHOtherSheTableViewCell *otherCell = [tableView dequeueReusableCellWithIdentifier:@"cell2"];
+        if (imageModel.otherImage) {
+            otherCell.otherImageView.image = imageModel.otherImage;
+        }else{
+            otherCell.otherImageView.image = [UIImage imageNamed:@"menses-gender-woman"];
+            self.otherAccount = [CYOtherAccountTool otherAccount];
+            if (cyAccount.otherUserName) {
+                AVQuery *query = [CYAccount query];
+                __weak typeof(self) weakSelf = self;
+                [query whereKey:@"userName" equalTo:cyAccount.otherUserName];
+                [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+                    if (!error) {
+                        weakSelf.otherAccount = [objects objectAtIndex:0];
+                        [CYOtherAccountTool saveOtherAccount:weakSelf.otherAccount];
+                        [otherCell.otherImageView sd_setImageWithURL:[NSURL URLWithString:weakSelf.otherAccount.iconURL] placeholderImage:[UIImage imageNamed:@"menses-gender-woman"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+                            if (!error) {
+                                imageModel.otherImage = image;
+                                [SHImageTool saveImageModel:imageModel];
+                            }
+                        }];
+                    }
+                }];
+            }
+        }
+        return otherCell;
+    }else if (indexPath.section==2) {
         cell.textLabel.text=[self.arr objectAtIndex:indexPath.row];
+        cell.textLabel.textColor = [UIColor blackColor];
+        cell.textLabel.textAlignment=NSTextAlignmentLeft;
+
     }else{
         cell.textLabel.text=@"退出登陆";
         cell.textLabel.textColor = [UIColor redColor];
@@ -162,18 +179,22 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     //点击cell  松开后颜色恢复点击前的颜色
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    
     if (indexPath.section == 0) {
+        SHMyProfileTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
         SHMyViewController *my = [SHMyViewController new];
+        my.nickName = cell.nickNameLabel.text;
+        my.iconImage = cell.iconImage.image;
         [self.navigationController pushViewController:my animated:YES];
     }
     
     if (indexPath.section == 1) {
         SHSheViewController *she = [SHSheViewController new];
+        SHOtherSheTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+        she.sheIconImage = cell.otherImageView.image;
         [self.navigationController pushViewController:she animated:YES];
     }
     
-        if (indexPath.section == 2 && indexPath.row == 1){
+    if (indexPath.section == 2 && indexPath.row == 0){
         //弹出框
         UIAlertController *alerVC = [UIAlertController alertControllerWithTitle:@"提示" message:@"是否确定清除缓存?" preferredStyle:(UIAlertControllerStyleAlert)];
         
@@ -186,39 +207,101 @@
         [alerVC addAction:action1];
         [alerVC addAction:action2];
         [self presentViewController:alerVC animated:YES completion:nil];
-    } else if (indexPath.section == 2 && indexPath.row == 2){
+    } else if (indexPath.section == 2 && indexPath.row == 1){
         //反馈(默认页面)
         LCUserFeedbackAgent *agent = [LCUserFeedbackAgent sharedInstance];
         [agent showConversations:self title:nil contact:nil];
 
-    } else if (indexPath.section == 2 && indexPath.row == 3){
+    } else if (indexPath.section == 2 && indexPath.row == 2){
         SHAboutusViewController *aboutus = [SHAboutusViewController new];
         [self.navigationController pushViewController:aboutus animated:YES];
     }
     
     if (indexPath.section == 3) {
         [CYAccountTool removeAccount];
+        [SHImageTool removeImageModel];
+        [SHAccountTool removeAccountHome];
+        [CYOtherAccountTool removeOtherAccount];
+        [[CDChatManager manager]closeWithCallback:^(BOOL succeeded, NSError *error) {
+        }];
         [UIApplication sharedApplication].keyWindow.rootViewController = nil;
         [CYRootTool setRootViewController];
-    }
-    
-    
-}
-//指纹解锁方法
--(void)switchAction:(id)sender{
-    UISwitch *switchButton = (UISwitch*)sender;
-    BOOL isButtonOn = [switchButton isOn];
-    if (isButtonOn) {
-        //指纹解锁开
-        NSLog(@"芝麻开门");
-    }else {
-        //指纹解锁关
-        NSLog(@"芝麻关门");
     }
 }
 
 //清除缓存方法
 -(void)setDelete{
-    NSLog(@"点我干嘛,没写完呢");
+    [self clearCache];
 }
+
+
+
+#pragma mark -- 缓存功能
+/**
+ * 垃圾清理功能
+ */
+-(void)clearCache
+{
+    NSString *cachePath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES)objectAtIndex:0];
+    unsigned long long size = [self fileSizeAtPath:cachePath];
+    NSString *contents = [NSString stringWithFormat:@"%@%.2fM,%@",@"当前有缓存",size/1024.0,@"清除有助于减少空间占有，但会导致加载之前浏览过的图片变慢，确定要清除？"];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"清除缓存" message:contents delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+    alert.alertViewStyle = UIAlertViewStyleDefault;
+    [alert show];
+    //NSLog(NSString * _Nonnull format, ...)
+}
+
+
+#pragma mark-UIAlertViewDelegate
+/**
+ * alert结束后调用
+ */
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 1)
+    {
+        _HUD = [[MBProgressHUD alloc] initWithView:self.view];
+        [self.view addSubview:_HUD];
+        _HUD.center = self.view.center;
+        _HUD.minSize = CGSizeMake(135.0f, 135.0f);
+        _HUD.mode = MBProgressHUDModeIndeterminate;
+        _HUD.labelText = @"清除中。。。";
+        [_HUD showWhileExecuting:@selector(clear) onTarget:self withObject:nil animated:YES];
+    }
+}
+- (void)clear
+{
+    NSString *cachePath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES)objectAtIndex:0];
+    NSArray *files = [[NSFileManager defaultManager] subpathsAtPath:cachePath];
+    for (NSString *p in files) {
+        NSError *error;
+        NSString *path = [cachePath stringByAppendingPathComponent:p];
+        if ([[NSFileManager defaultManager]fileExistsAtPath:path]) {
+            [[NSFileManager defaultManager]removeItemAtPath:path error:&error];
+        }
+    }
+    [self clearCacheSuccess];
+}
+/**
+ * 清理缓存成功
+ */
+-(void)clearCacheSuccess{
+    sleep(2);
+    _HUD.customView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"black_tips_ok.png"]];
+    _HUD.mode = MBProgressHUDModeCustomView;
+    _HUD.labelText = @"清除成功";
+    sleep(1);
+}
+/**
+ * 计算缓存大小
+ */
+-(long long)fileSizeAtPath:(NSString *)filePath
+{
+    NSFileManager *manager = [NSFileManager defaultManager];
+    if ([manager fileExistsAtPath:filePath]) {
+        return [[manager attributesOfItemAtPath:filePath error:nil]fileSize];
+    }
+    return 0;
+}
+
 @end

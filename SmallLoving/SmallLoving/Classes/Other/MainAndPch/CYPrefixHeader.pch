@@ -38,3 +38,5 @@
 #import "SHLeftBackButton.h"
 
 #import "CYAlertController.h"
+
+#define SHNotificationCenter [NSNotificationCenter defaultCenter]

@@ -40,8 +40,7 @@
         make.left.equalTo(self).offset(10);
         make.bottom.equalTo(self);
     }];
-    long long int day = 0;
-    [self.loveTimeBtn setTitle:[NSString stringWithFormat:@"我们已相爱%lld天",day] forState:UIControlStateNormal];
+    
     [self.loveTimeBtn.titleLabel setFont:[UIFont systemFontOfSize:13]];
 //    self.loveTimeBtn.backgroundColor = [UIColor redColor];
     //右侧相机相册btn
