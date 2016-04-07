@@ -34,41 +34,13 @@
 
 - (void)loadViews{
     
-    UIImageView* header = [[UIImageView alloc] initWithFrame:CGRectMake(kWidth/ 2 - 211 / 2, 40, 211, 109)];
-    
-    header.image=[UIImage imageNamed:@"header"];
-    [self addSubview:header];
-    
-    //添加button 点击触发动画
-    self.headButton = [[UIButton alloc]initWithFrame:CGRectMake(0, 0, 211, 109)];
-    self.headButton.backgroundColor = [UIColor clearColor];
-  
 
-    
-    _lefthArm=[[UIImageView alloc]initWithFrame:rectLeftArm];
-    _lefthArm.image=[UIImage imageNamed:@"left"];
-    [header addSubview:_lefthArm];
-    
-    
-    _rightArm=[[UIImageView alloc]initWithFrame:rectRightArm];
-    _rightArm.image=[UIImage imageNamed:@"right"];
-    [header addSubview:_rightArm];
-    [header addSubview:self.headButton];
-    [header bringSubviewToFront:self.headButton];
-    header.userInteractionEnabled = YES ;
-    UIView *loginview=[[UIView alloc]initWithFrame:CGRectMake(15, 140, kWidth-30, 260)];
+    UIView *loginview=[[UIView alloc]initWithFrame:CGRectMake(15, 20, kWidth-30, 260)];
     loginview.layer.borderWidth=1;
     loginview.layer.borderColor=[UIColor lightGrayColor].CGColor;
     loginview.backgroundColor=[UIColor colorWithWhite:0.9 alpha:1];
     [self addSubview:loginview];
-    
-    _lefthand = [[UIImageView alloc]initWithFrame:rectLeftHand];
-    _lefthand.image = [UIImage imageNamed:@"hand"];
-    [self addSubview:_lefthand];
-    
-    _righthand = [[UIImageView alloc]initWithFrame:rectRightHand];
-    _righthand.image = [UIImage imageNamed:@"hand"];
-    [self addSubview:_righthand];
+
     self.titleField=[[UITextField alloc]initWithFrame:CGRectMake(30, 30, kWidth-90, 44)];
     self.titleField.layer.cornerRadius = 5;
     self.titleField.layer.borderColor = [UIColor lightGrayColor].CGColor;

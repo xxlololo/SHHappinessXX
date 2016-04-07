@@ -35,7 +35,7 @@
     self.postMood.headButton.userInteractionEnabled =YES ;
     self.postMood.textV.delegate = self;
     self.postMood.titleField.delegate = self;
-    
+
 }
 
 - (void)viewDidAppear:(BOOL)animated{
@@ -51,8 +51,10 @@
     
     
 }
+//textView开始编辑
 - (void)textViewDidBeginEditing:(UITextView *)textView{
     self.postMood.promptTitle.hidden = YES;
+
 }
 
 
@@ -159,6 +161,25 @@
     }
     return YES;
 }
-
-
+////视图上移的方法
+//- (void)animateTextView:(UITextView *)textView up:(BOOL)up{
+//    if (self.view.frame.size.height ==548&&self.view.frame.size.width==320) {
+//        NSLog(@"abcdefghij");
+//    }
+//        //设置视图上移的距离，单位像素
+//       const int movementDistance = 80;
+//        //三目运算，判定是否需要上移视图或者不变
+//        int movement = (up ? -movementDistance : movementDistance);
+//        //设置动画的名字
+//        [UIView beginAnimations:@"Animation" context:nil];
+//        //设置动画的开始移动位置
+//        [UIView setAnimationBeginsFromCurrentState: YES];
+//        //设置动画的间隔时间
+//        [UIView setAnimationDuration: 0.20];
+//        //设置视图移动的位移
+//        self.view.frame = CGRectOffset(self.view.frame, 0, movement);
+//        //设置动画结束
+//        [UIView commitAnimations];
+//    
+//}
 @end
