@@ -67,6 +67,11 @@
 			<key>orderHint</key>
 			<integer>15</integer>
 		</dict>
+		<key>MJRefresh.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>16</integer>
+		</dict>
 		<key>Masonry.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -133,6 +138,11 @@
 			<key>primary</key>
 			<true/>
 		</dict>
+		<key>8F74D9EA91F4C43190670066BAC37D44</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>9775596B3CA16905FC8F66DA8E2A3C67</key>
 		<dict>
 			<key>primary</key>
@@ -149,6 +159,11 @@
 			<true/>
 		</dict>
 		<key>A22DD773F789336EFAE07235443392B0</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>A446EDC318991B88067E97588F50531E</key>
 		<dict>
 			<key>primary</key>
 			<true/>

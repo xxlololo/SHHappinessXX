@@ -34,12 +34,13 @@
 
 - (void)loadViews{
     
+
+
     UIView *loginview=[[UIView alloc]initWithFrame:CGRectMake(15, 20, kWidth-30, 260)];
     loginview.layer.borderWidth=1;
     loginview.layer.borderColor=[UIColor lightGrayColor].CGColor;
     loginview.backgroundColor=[UIColor colorWithWhite:0.9 alpha:1];
     [self addSubview:loginview];
-    
     self.titleField=[[UITextField alloc]initWithFrame:CGRectMake(30, 30, kWidth-90, 44)];
     self.titleField.layer.cornerRadius = 5;
     self.titleField.layer.borderColor = [UIColor lightGrayColor].CGColor;
