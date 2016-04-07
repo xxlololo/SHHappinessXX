@@ -42,7 +42,7 @@
 
 - (UIImageView *)titleImgView {
     if (!_titleImgView) {
-        UIImageView * titleImg = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"welcome-logo"]];
+        UIImageView * titleImg = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"logo"]];
         _titleImgView = titleImg;
         [self.bgView addSubview:titleImg];
     }
@@ -53,7 +53,7 @@
 - (UILabel *)titleLabel {
     if (!_titleLabel) {
         UILabel * label = [[UILabel alloc]init];
-        label.text = @"情侣必备, 二人专属";
+        label.text = @"小幸福,让幸福升温";
         label.textColor = [UIColor whiteColor];
         _titleLabel = label;
         [self.bgView addSubview:label];
@@ -163,6 +163,7 @@
     self.titleImgView.center = self.bgView.center;
     [self.titleImgView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.center.equalTo(self.bgView);
+        make.size.mas_equalTo(CGSizeMake(100, 100));
     }];
     self.titleLabel.center = CGPointMake(CGRectGetMidX(self.titleImgView.frame), CGRectGetMaxY(self.titleImgView.frame) + 10);
     [self.titleLabel mas_makeConstraints:^(MASConstraintMaker *make) {

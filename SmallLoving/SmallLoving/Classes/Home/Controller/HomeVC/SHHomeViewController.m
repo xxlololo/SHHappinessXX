@@ -18,11 +18,16 @@
 #import "CYAccountTool.h"
 #import "CYAccount.h"
 #import <MJExtension.h>
+#import <CoreLocation/CoreLocation.h>
 
-@interface SHHomeViewController ()<UINavigationControllerDelegate, UIImagePickerControllerDelegate>
+@interface SHHomeViewController ()<UINavigationControllerDelegate, UIImagePickerControllerDelegate,CLLocationManagerDelegate>
 @property(nonatomic, strong)SHHomeScrollView *homeScrollView;
 @property(nonatomic, assign)CGFloat picHeight;
 @property(nonatomic, strong)SHAccountHome *accountHome;
+@property (nonatomic, strong)CLLocationManager *locationManager;
+@property (nonatomic, assign)CLLocationDegrees latitude;//纬度
+@property (nonatomic, assign)CLLocationDegrees longitude;//经度
+
 @end
 
 @implementation SHHomeViewController
@@ -74,6 +79,28 @@ const CGFloat kStatusBarHeight = 20;
 
     self.accountHome = accountHome;
     
+    //定位管理器
+    self.locationManager=[[CLLocationManager alloc]init];
+    
+    if (![CLLocationManager locationServicesEnabled]) {
+        NSLog(@"定位服务当前可能尚未打开，请设置打开！");
+        return;
+    }
+    
+    //如果没有授权则请求用户授权
+    if ([CLLocationManager authorizationStatus]==kCLAuthorizationStatusNotDetermined){
+        [self.locationManager requestAlwaysAuthorization];
+    }
+    //设置代理
+    self.locationManager.delegate=self;
+    //设置定位精度
+    self.locationManager.desiredAccuracy=kCLLocationAccuracyBest;
+    //定位频率,每隔多少米定位一次
+    CLLocationDistance distance=10.0;//十米定位一次
+    self.locationManager.distanceFilter=distance;
+    //启动跟踪定位
+    [self.locationManager startUpdatingLocation];
+
 }
 
 - (void)viewWillAppear:(BOOL)animated{
@@ -228,6 +255,40 @@ const CGFloat kStatusBarHeight = 20;
 }
 
 
+//CLLocationManagerDelegate代理方法
+-(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+{
+    //获取账户信息
+    CYAccount *cyAccount = [CYAccountTool account];
+    if (cyAccount.objectId) {
+        //此处locations存储了持续更新的位置坐标值，取最后一个值为最新位置，如果不想让其持续更新位置，则在此方法中获取到一个值之后让locationManager stopUpdatingLocation
+        CLLocation *currentLocation = [locations lastObject];
+        
+        CLLocationCoordinate2D coor = currentLocation.coordinate;
+        self.latitude =  coor.latitude;
+        self.longitude = coor.longitude;
+        
+        cyAccount.latitude = [NSString stringWithFormat:@"%f",self.latitude];
+        cyAccount.longitude = [NSString stringWithFormat:@"%f",self.longitude];
+        //存储到沙盒
+        //上传到云端
+        [CYAccountTool saveAccount:cyAccount];
+        //上传到云端
+        
+        AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"CYAccount" objectId:cyAccount.objectId];
+        [accountAV setObject:cyAccount.latitude forKey:@"latitude"];
+        [accountAV setObject:cyAccount.longitude forKey:@"longitude"];
+        [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+            if (succeeded) {
+                //存储到本地
+                CYLog(@"存储位置坐标成功");
+                [CYAccountTool saveAccount:cyAccount];
+            }
+        }];
+    }
+    //[self.locationManager stopUpdatingLocation];
+    
+}
 
 
 

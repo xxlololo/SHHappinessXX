@@ -87,6 +87,8 @@
     //注册cell
     [self.tableView registerClass:[SHSpaceCell class] forCellReuseIdentifier:@"cell"];
     
+    self.tableView.showsVerticalScrollIndicator = NO;
+    
     //下拉刷新
     [self setupDownRefresh];
     //上拉加载
@@ -164,8 +166,8 @@
 - (void)refreshStateChangeDown{
     
     AVQuery *query = [AVQuery queryWithClassName:@"SweetTime"];
-    AVObject *objAV = self.spaceArray.firstObject;
-    if (objAV) {
+    if (self.spaceArray.count > 0) {
+        AVObject *objAV = self.spaceArray.firstObject;
         NSDate *createdDate = [objAV objectForKey:@"createdAt"];
         [query whereKey:@"createdAt" greaterThan:createdDate];
     }
@@ -173,10 +175,11 @@
     query.limit = 10; // 最多返回 10 条结果
     __weak typeof(self) weakSelf = self;
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
-        
-        NSRange range = NSMakeRange(0, objects.count);
-        NSIndexSet *set = [NSIndexSet indexSetWithIndexesInRange:range];
-        [weakSelf.spaceArray insertObjects:objects atIndexes:set];
+        if (!error) {
+            NSRange range = NSMakeRange(0, objects.count);
+            NSIndexSet *set = [NSIndexSet indexSetWithIndexesInRange:range];
+            [weakSelf.spaceArray insertObjects:objects atIndexes:set];
+        }
         //结束刷新
         [weakSelf.tableView.mj_header endRefreshing];
         [weakSelf.tableView reloadData];
@@ -189,6 +192,11 @@
 }
 
 - (void)refreshStateChangeUp{
+    if (self.spaceArray.count == 0) {
+        //结束刷新
+        [self.tableView.mj_footer endRefreshing];
+        return;
+    }
     AVQuery *query = [AVQuery queryWithClassName:@"SweetTime"];
     NSDate *createdDate = [self.spaceArray.lastObject objectForKey:@"createdAt"];
     [query whereKey:@"createdAt" lessThan:createdDate];
@@ -196,7 +204,9 @@
     query.limit = 10; // 最多返回 10 条结果
     __weak typeof(self) weakSelf = self;
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
-        [weakSelf.spaceArray addObjectsFromArray:objects];
+        if (!error) {
+            [weakSelf.spaceArray addObjectsFromArray:objects];
+        }
         [weakSelf.tableView reloadData];
         //结束刷新
         [weakSelf.tableView.mj_footer endRefreshing];

@@ -29,8 +29,6 @@
 @property(nonatomic, strong)NSArray *picArray;
 @property(nonatomic, strong)NSArray *picTitleArr;
 @property (nonatomic, strong)CLLocationManager *locationManager;
-@property (nonatomic, assign)CLLocationDegrees latitude;//纬度
-@property (nonatomic, assign)CLLocationDegrees longitude;//经度
 @end
 
 @implementation SHExtensionViewController
@@ -75,6 +73,7 @@
     [SHHTTPManager shareHTTPManager].reloadDataBlock = ^(){
         [weakSelf.collectionView reloadData];
     };
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated{
@@ -197,8 +196,6 @@
 - (void)areaLocation{
     // 判断定位操作是否被允许
     if([CLLocationManager locationServicesEnabled]) {
-        self.locationManager = [[CLLocationManager alloc] init];
-        self.locationManager.delegate = self;
         [self sendDistance];
     }else {
         //提示用户无法进行定位操作
@@ -211,8 +208,7 @@
         [self presentViewController:alertVC animated:YES completion:nil];
         return;
     }
-    // 开始定位
-    [self.locationManager startUpdatingLocation];
+    
 }
 
 //计算两点距离
@@ -222,12 +218,13 @@
     if (cyAccount.otherUserName) {
         AVQuery *query = [CYAccount query];
         [query whereKey:@"userName" equalTo:cyAccount.otherUserName];
+        __weak typeof(self) weakSelf = self;
         [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
             if (!error) {
                 CYAccount *otherAccount = [objects objectAtIndex:0];
                 //对方坐标
                 //第一个坐标
-                CLLocation *current= [[CLLocation alloc] initWithLatitude:self.latitude longitude:self.longitude];
+                CLLocation *current= [[CLLocation alloc] initWithLatitude:cyAccount.latitude.doubleValue longitude:cyAccount.longitude.doubleValue];
                 
                 CLLocation *otherLoation = [[CLLocation alloc] initWithLatitude:otherAccount.latitude.doubleValue longitude:otherAccount.longitude.doubleValue];
                 // 计算距离
@@ -244,7 +241,7 @@
                 }];
                 [alertVC addAction:action];
                 // 模态显示
-                [self presentViewController:alertVC animated:YES completion:nil];
+                [weakSelf presentViewController:alertVC animated:YES completion:nil];
             }
         }];
     } else {
@@ -259,55 +256,7 @@
     
 }
 
-//CLLocationManagerDelegate代理方法
--(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
-{
-    //此处locations存储了持续更新的位置坐标值，取最后一个值为最新位置，如果不想让其持续更新位置，则在此方法中获取到一个值之后让locationManager stopUpdatingLocation
-    CLLocation *currentLocation = [locations lastObject];
-    
-    CLLocationCoordinate2D coor = currentLocation.coordinate;
-    self.latitude =  coor.latitude;
-    self.longitude = coor.longitude;
-    //获取账户信息
-    CYAccount *cyAccount = [CYAccountTool account];
-    cyAccount.latitude = [NSString stringWithFormat:@"%f",self.latitude];
-    cyAccount.longitude = [NSString stringWithFormat:@"%f",self.longitude];
-    //存储到沙盒
-    //上传到云端
-    [CYAccountTool saveAccount:cyAccount];
-    //上传到云端
-    AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"CYAccount" objectId:cyAccount.objectId];
-    [accountAV setObject:cyAccount.latitude forKey:@"latitude"];
-    [accountAV setObject:cyAccount.longitude forKey:@"longitude"];
-    [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-        if (succeeded) {
-            //存储到本地
-            CYLog(@"存储位置坐标成功");
-            [CYAccountTool saveAccount:cyAccount];
-        }
-    }];
 
-    [self sendDistance];
-    //[self.locationManager stopUpdatingLocation];
-
-}
-
-//更新失败的方法
-- (void)locationManager:(CLLocationManager *)manager
-       didFailWithError:(NSError *)error {
-//    if (error.code == kCLErrorDenied) {
-        // 提示用户出错原因，可按住Option键点击 KCLErrorDenied的查看更多出错信息，可打印error.code值查找原因所在
-        NSLog(@"更新失败====%ld",(long)error.code);
-        //提示用户无法进行定位操作
-        UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:@"提示" message:@"更新失败" preferredStyle:(UIAlertControllerStyleAlert)];
-        UIAlertAction *action = [UIAlertAction actionWithTitle:@"确定" style:(UIAlertActionStyleDefault) handler:^(UIAlertAction *action) {
-            
-        }];
-        [alertVC addAction:action];
-        // 模态显示
-        [self presentViewController:alertVC animated:YES completion:nil];
-//    }
-}
 
 
 

@@ -161,11 +161,21 @@
         cell.nickNameLabel.text = self.otherAccount.userName;
     }
     if(indexPath.section == 1){
-        UITableViewCell *tabCell = [tableView dequeueReusableCellWithIdentifier:@"cell2"];
-        tabCell.textLabel.text=@"解除关系";
-        tabCell.textLabel.textColor = [UIColor redColor];
-        tabCell.textLabel.textAlignment=NSTextAlignmentCenter;
-        return tabCell;
+        CYAccount *account = [CYAccountTool account];
+        if (account.otherUserName) {
+            UITableViewCell *tabCell = [tableView dequeueReusableCellWithIdentifier:@"cell2"];
+            tabCell.textLabel.text=@"解除关系";
+            tabCell.textLabel.textColor = [UIColor redColor];
+            tabCell.textLabel.textAlignment=NSTextAlignmentCenter;
+            return tabCell;
+        }else{
+            UITableViewCell *tabCell = [tableView dequeueReusableCellWithIdentifier:@"cell2"];
+            tabCell.textLabel.text=@"添加另一半";
+            tabCell.textLabel.textColor = [UIColor blackColor];
+            tabCell.textLabel.textAlignment=NSTextAlignmentCenter;
+            return tabCell;
+
+        }
     }
     return cell;
 }
@@ -176,22 +186,29 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     if (indexPath.section==1) {
-        UIAlertController *alerVC = [UIAlertController alertControllerWithTitle:@"提示" message:@"十年修得同船渡,百年修得共枕眠.除非不爱了,否则我们不建议您轻易迈出这一步,请珍惜,请三思." preferredStyle:(UIAlertControllerStyleAlert)];
-        
-        UIAlertAction *action1 = [UIAlertAction actionWithTitle:@"解除关系" style:(UIAlertActionStyleDefault) handler:^(UIAlertAction *action) {
-            [self unchain];
-        }];
-        UIAlertAction *action2 = [UIAlertAction actionWithTitle:@"手滑,点错了" style:(UIAlertActionStyleDefault) handler:^(UIAlertAction *action) {
-            [self dismissViewControllerAnimated:YES completion:nil];
-        }];
-        [alerVC addAction:action1];
-        [alerVC addAction:action2];
-        [self presentViewController:alerVC animated:YES completion:nil];
+        CYAccount *cyAccount = [CYAccountTool account];
+        if (cyAccount.otherUserName) {
+            UIAlertController *alerVC = [UIAlertController alertControllerWithTitle:@"提示" message:@"十年修得同船渡,百年修得共枕眠.除非不爱了,否则我们不建议您轻易迈出这一步,请珍惜,请三思." preferredStyle:(UIAlertControllerStyleAlert)];
+            
+            UIAlertAction *action1 = [UIAlertAction actionWithTitle:@"解除关系" style:(UIAlertActionStyleDefault) handler:^(UIAlertAction *action) {
+                [self unchain];
+            }];
+            UIAlertAction *action2 = [UIAlertAction actionWithTitle:@"手滑,点错了" style:(UIAlertActionStyleDefault) handler:^(UIAlertAction *action) {
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }];
+            [alerVC addAction:action1];
+            [alerVC addAction:action2];
+            [self presentViewController:alerVC animated:YES completion:nil];
+        }else{
+            SHOtherViewController *otherVC = [[SHOtherViewController alloc] init];
+            [self.navigationController pushViewController:otherVC animated:YES];
+        }
     }
 }
 
 -(void)unchain{
     //保存
+    [self layoutHUD];
     CYAccount *cyAccount = [CYAccountTool account];
     NSString *otherUserName = cyAccount.otherUserName;
     NSString *accountHomeObjID = cyAccount.accountHomeObjID;
@@ -236,9 +253,15 @@
                     [otherAccount saveInBackground];
                 }
             }];
-
-            
             UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:nil message:@"关系解除成功" preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                [weakSelf.navigationController popViewControllerAnimated:YES];
+            }];
+            [alertVC addAction:confirm];
+            [weakSelf.hud removeFromSuperview];
+            [weakSelf presentViewController:alertVC animated:YES completion:nil];
+        }else{
+            UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:nil message:@"关系解除失败" preferredStyle:UIAlertControllerStyleAlert];
             UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 [weakSelf.navigationController popViewControllerAnimated:YES];
             }];
