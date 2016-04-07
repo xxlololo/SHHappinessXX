@@ -142,6 +142,8 @@
 		F01FB4031CB18FAD0063E07F /* SHNickNameTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F01FB4021CB18FAD0063E07F /* SHNickNameTableViewCell.m */; };
 		F01FB4061CB192260063E07F /* SHOtherSheTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F01FB4051CB192260063E07F /* SHOtherSheTableViewCell.m */; };
 		F01FB4091CB197770063E07F /* CYOtherAccountTool.m in Sources */ = {isa = PBXBuildFile; fileRef = F01FB4081CB197770063E07F /* CYOtherAccountTool.m */; };
+		F02411841CB69F9D00F0011D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F02411831CB69F9D00F0011D /* LaunchScreen.storyboard */; };
+		F02411861CB6A01700F0011D /* qidongtu.png in Resources */ = {isa = PBXBuildFile; fileRef = F02411851CB6A01700F0011D /* qidongtu.png */; };
 		F06F1BDB1CAEC9C4004F8542 /* SHWriteDiaryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F06F1BDA1CAEC9C4004F8542 /* SHWriteDiaryViewController.m */; };
 		F06F1BDF1CAECAAF004F8542 /* SHDiaryView.m in Sources */ = {isa = PBXBuildFile; fileRef = F06F1BDE1CAECAAF004F8542 /* SHDiaryView.m */; };
 		F06F1BE21CAFB32F004F8542 /* SHDiaryModel.m in Sources */ = {isa = PBXBuildFile; fileRef = F06F1BE11CAFB32F004F8542 /* SHDiaryModel.m */; };
@@ -179,7 +181,6 @@
 		040A4E0D1CA3EB1C00575188 /* CYAccountTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYAccountTool.m; sourceTree = "<group>"; };
 		0411242D1C9D3FD7001B7DD2 /* SmallLoving.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmallLoving.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0411243C1C9D3FD7001B7DD2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		0411243F1C9D3FD7001B7DD2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		041124411C9D3FD7001B7DD2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		041124461C9D3FD8001B7DD2 /* SmallLovingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SmallLovingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0411244A1C9D3FD8001B7DD2 /* SmallLovingTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SmallLovingTests.m; sourceTree = "<group>"; };
@@ -428,6 +429,8 @@
 		F01FB4051CB192260063E07F /* SHOtherSheTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SHOtherSheTableViewCell.m; sourceTree = "<group>"; };
 		F01FB4071CB197770063E07F /* CYOtherAccountTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYOtherAccountTool.h; sourceTree = "<group>"; };
 		F01FB4081CB197770063E07F /* CYOtherAccountTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYOtherAccountTool.m; sourceTree = "<group>"; };
+		F02411831CB69F9D00F0011D /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		F02411851CB6A01700F0011D /* qidongtu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = qidongtu.png; sourceTree = "<group>"; };
 		F06F1BD91CAEC9C4004F8542 /* SHWriteDiaryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHWriteDiaryViewController.h; sourceTree = "<group>"; };
 		F06F1BDA1CAEC9C4004F8542 /* SHWriteDiaryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SHWriteDiaryViewController.m; sourceTree = "<group>"; };
 		F06F1BDD1CAECAAF004F8542 /* SHDiaryView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHDiaryView.h; sourceTree = "<group>"; };
@@ -520,7 +523,8 @@
 				F0016CF01CABE2BE00DF38F9 /* ZLPhotoLib */,
 				041124AD1C9D4385001B7DD2 /* Classes */,
 				0411243C1C9D3FD7001B7DD2 /* Assets.xcassets */,
-				0411243E1C9D3FD7001B7DD2 /* LaunchScreen.storyboard */,
+				F02411831CB69F9D00F0011D /* LaunchScreen.storyboard */,
+				F02411851CB6A01700F0011D /* qidongtu.png */,
 				041124411C9D3FD7001B7DD2 /* Info.plist */,
 			);
 			path = SmallLoving;
@@ -1515,7 +1519,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F02411841CB69F9D00F0011D /* LaunchScreen.storyboard in Resources */,
 				04EF90791CA4CBB700DCE9E2 /* SHMenstruationTableViewCell.xib in Resources */,
+				F02411861CB6A01700F0011D /* qidongtu.png in Resources */,
 				04EF90EE1CA4D4C200DCE9E2 /* lovebird.png in Resources */,
 				04EF90FC1CA4D4C200DCE9E2 /* sweetGame.plist in Resources */,
 				C2D403341CAD250C00D5E7E5 /* game.png in Resources */,
@@ -1765,17 +1771,6 @@
 			targetProxy = 041124521C9D3FD8001B7DD2 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		0411243E1C9D3FD7001B7DD2 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				0411243F1C9D3FD7001B7DD2 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		041124581C9D3FD8001B7DD2 /* Debug */ = {

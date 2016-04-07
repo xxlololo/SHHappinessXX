@@ -26,13 +26,14 @@
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
     //取出账号信息
-    SHAccountHome *accountHome = [SHAccountTool account];
+
+    CYAccount *cyAccount = [CYAccountTool account];
     
     SHSleepView *sleepView = [[SHSleepView alloc] initWithFrame:self.view.bounds];
     _sleepView = sleepView;
     [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(dataChangeAction) userInfo:nil repeats:YES];
     
-    sleepView.sleepTimeLabel.text = [sleepView createdSinceNowWithDate:accountHome.sleepTimeDate];
+    sleepView.sleepTimeLabel.text = [sleepView createdSinceNowWithDate:cyAccount.sleepTimeDate];
     
     [self.view addSubview:sleepView];
     
@@ -43,32 +44,32 @@
 }
 
 - (void)dataChangeAction {
-    SHAccountHome *accountHome = [SHAccountTool account];
-    _sleepView.sleepTimeLabel.text = [_sleepView createdSinceNowWithDate:accountHome.sleepTimeDate];
+    CYAccount *cyAccount = [CYAccountTool account];
+    _sleepView.sleepTimeLabel.text = [_sleepView createdSinceNowWithDate:cyAccount.sleepTimeDate];
 
 }
 
 - (void)wakeBtnAction:(UIButton *)button{
     //取出账号信息
-    SHAccountHome *accountHome = [SHAccountTool account];
-    accountHome.isSleep = @"NO";
-    accountHome.sleepTimeDate = nil;
-    //存进沙盒
     CYAccount *cyAccount = [CYAccountTool account];
+    cyAccount.isSleep = @"NO";
+    cyAccount.sleepTimeDate = nil;
+    //存进沙盒
     //上传到云端
-    if (cyAccount.accountHomeObjID) {
-        AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"SHAccountHome" objectId:cyAccount.accountHomeObjID];
-        [accountAV setObject:accountHome.mj_keyValues forKey:@"accountHome"];
-        [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-            if (succeeded) {
-                //存储到本地
-                CYLog(@"存储睡觉信息成功");
-                //存储到沙盒
-                [SHAccountTool saveAccount:accountHome];
-            }
-        }];
-    }
-    [SHAccountTool saveAccount:accountHome];
+
+    AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"CYAccount" objectId:cyAccount.objectId];
+    [accountAV setObject:cyAccount.isSleep forKey:@"isSleep"];
+    [accountAV setObject:cyAccount.sleepTimeDate forKey:@"sleepTimeDate"];
+    [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+        if (succeeded) {
+            //存储到本地
+            CYLog(@"存储睡觉信息成功");
+            //存储到沙盒
+            [CYAccountTool saveAccount:cyAccount];
+        }
+    }];
+
+    [CYAccountTool saveAccount:cyAccount];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 

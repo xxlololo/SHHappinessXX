@@ -62,22 +62,9 @@ const CGFloat kStatusBarHeight = 20;
     [self addChildViewController:extensionVC];
     [self.homeScrollView.extensionView addSubview:extensionVC.view];
     
-    //获取账户信息
-    SHAccountHome *accountHome = [SHAccountTool account];
-    SHImageModel *imageModel = [SHImageTool imageModel];
-    if (imageModel.coverImage) {
-        self.homeScrollView.coverImageView.image = imageModel.coverImage;
-    }else{
-        if (accountHome.coverImageUrl) {
-            [self.homeScrollView.coverImageView sd_setImageWithURL:[NSURL URLWithString:accountHome.coverImageUrl] placeholderImage:[UIImage imageNamed:@"9302B515F05E3A5492878E82F5D69EEA"]];
-            imageModel.coverImage = self.homeScrollView.coverImageView.image;
-            [SHImageTool saveImageModel:imageModel];
-        }else{
-            self.homeScrollView.coverImageView.image = [UIImage imageNamed:@"9302B515F05E3A5492878E82F5D69EEA"];
-        }
-    }
-
-    self.accountHome = accountHome;
+    [self setCoverImage];
+    
+    self.accountHome = [SHAccountTool account];
     
     //定位管理器
     self.locationManager=[[CLLocationManager alloc]init];
@@ -100,8 +87,29 @@ const CGFloat kStatusBarHeight = 20;
     self.locationManager.distanceFilter=distance;
     //启动跟踪定位
     [self.locationManager startUpdatingLocation];
-
 }
+
+- (void)setCoverImage{
+    //获取账户信息
+    SHAccountHome *accountHome = [SHAccountTool account];
+    SHImageModel *imageModel = [SHImageTool imageModel];
+    if (accountHome.coverImageUrl) {
+        if (imageModel.coverImage) {
+            [self.homeScrollView.coverImageView sd_setImageWithURL:[NSURL URLWithString:accountHome.coverImageUrl] placeholderImage:imageModel.coverImage completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+                imageModel.coverImage = self.homeScrollView.coverImageView.image;
+                [SHImageTool saveImageModel:imageModel];
+            }];
+        }else{
+            [self.homeScrollView.coverImageView sd_setImageWithURL:[NSURL URLWithString:accountHome.coverImageUrl] placeholderImage: [UIImage imageNamed:@"9302B515F05E3A5492878E82F5D69EEA"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+                imageModel.coverImage = self.homeScrollView.coverImageView.image;
+                [SHImageTool saveImageModel:imageModel];
+            }];
+        }
+    }else{
+        self.homeScrollView.coverImageView.image = [UIImage imageNamed:@"9302B515F05E3A5492878E82F5D69EEA"];
+    }
+}
+
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
@@ -118,6 +126,9 @@ const CGFloat kStatusBarHeight = 20;
         day = (int)(timeInterval/86400);
     }
     [self.homeScrollView.coverImageView.loveTimeBtn setTitle:[NSString stringWithFormat:@"我们已相爱%ld天",day] forState:UIControlStateNormal];
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        [self setCoverImage];
+    });
 }
 
 - (void)viewDidAppear:(BOOL)animated{
@@ -220,7 +231,7 @@ const CGFloat kStatusBarHeight = 20;
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info{
     [picker dismissViewControllerAnimated:YES completion:nil];
     //info中包含了选择的图片
-    UIImage *image = info[UIImagePickerControllerOriginalImage];
+    UIImage *image = info[UIImagePickerControllerEditedImage];
     //添加图片到photosView中
     self.homeScrollView.coverImageView.image = image;
     

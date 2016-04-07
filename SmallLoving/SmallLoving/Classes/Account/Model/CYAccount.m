@@ -20,6 +20,8 @@
 @dynamic sex;
 @dynamic latitude;
 @dynamic longitude;
+@dynamic sleepTimeDate;
+@dynamic isSleep;
 
 
 + (NSString *)parseClassName {

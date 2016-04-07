@@ -259,12 +259,9 @@
     __weak typeof(self) weakSelf = self;
     pickerVc.callBack = ^(NSArray<ZLPhotoAssets *> *status){
         for (ZLPhotoAssets *photoAssets in status) {
-
             [weakSelf.photoArr addObject:photoAssets.originImage];
-            
             //添加图片到photoArray中
             imageModel.photosArr = weakSelf.photoArr;
-
             //保存到沙盒上传到云端
             if (cyAccount.accountHomeObjID) {
                 NSData *imageData = UIImagePNGRepresentation(photoAssets.originImage);
@@ -400,6 +397,52 @@
 
         [self.collectionView reloadData];
     }
+}
+
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info{
+    [picker dismissViewControllerAnimated:YES completion:nil];
+    //info中包含了选择的图片
+    UIImage *image = info[UIImagePickerControllerEditedImage];
+    //添加图片到photosView中
+    //获取账户信息
+    SHAccountHome *accountHome = [SHAccountTool account];
+    //获取图片model
+    SHImageModel *imageModel = [SHImageTool imageModel];
+    CYAccount *cyAccount = [CYAccountTool account];
+    NSMutableArray *photoUrlArr = [NSMutableArray arrayWithArray:accountHome.photoUrlArray];
+    [self.photoArr addObject:image];
+    
+    //添加图片到photoArray中
+    imageModel.photosArr = self.photoArr;
+    
+    //保存到沙盒上传到云端
+    if (cyAccount.accountHomeObjID) {
+        NSData *imageData = UIImagePNGRepresentation(image);
+        AVFile *file = [AVFile fileWithName:@"photoImage.png" data:imageData];
+        [file saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+            if (succeeded) {
+                [photoUrlArr addObject:file.url];
+                accountHome.photoUrlArray = photoUrlArr;
+                //上传到云端
+                AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"SHAccountHome" objectId:cyAccount.accountHomeObjID];
+                [accountAV setObject:accountHome.mj_keyValues forKey:@"accountHome"];
+                [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                    if (succeeded) {
+                        //存储到本地
+                        CYLog(@"存储相册图片成功");
+                        //存储到沙盒
+                        [SHAccountTool saveAccount:accountHome];
+                        [SHImageTool saveImageModel:imageModel];
+                    }
+                }];
+            }
+        }
+         ];
+    }
+    [self.collectionView reloadData];
+    [SHAccountTool saveAccount:accountHome];
+    [SHImageTool saveImageModel:imageModel];
+
 }
 
 

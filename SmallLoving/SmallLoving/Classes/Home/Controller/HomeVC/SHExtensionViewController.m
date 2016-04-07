@@ -21,6 +21,8 @@
 #import "CYAccount.h"
 #import "CYAccountTool.h"
 #import "SHHTTPManager.h"
+#import <CDChatManager.h>
+
 
 #define kWAndH ([UIScreen mainScreen].bounds.size.width - 40) / 3
 
@@ -29,6 +31,7 @@
 @property(nonatomic, strong)NSArray *picArray;
 @property(nonatomic, strong)NSArray *picTitleArr;
 @property (nonatomic, strong)CLLocationManager *locationManager;
+@property (nonatomic, strong) AVIMClient *client;
 @end
 
 @implementation SHExtensionViewController
@@ -97,9 +100,9 @@
     NSString *picName = self.picArray[indexPath.row];
     NSString *picTitle = self.picTitleArr[indexPath.row];
     //获取账户信息
-    SHAccountHome *accountHome = [ SHAccountTool account];
+    CYAccount *cyAccount = [CYAccountTool account];
     if (indexPath.row == 0) {
-        if ([accountHome.isSleep isEqualToString:@"YES"]) {
+        if ([cyAccount.isSleep isEqualToString:@"YES"]) {
             cell.extensionView.imageView.image = [UIImage imageNamed:@"extension-sleeping-icon"];
             cell.extensionView.label.text = @"正在睡觉";
             return cell;
@@ -116,9 +119,10 @@
 
     UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:(UIAlertControllerStyleActionSheet)];
     //获取账户信息
-    SHAccountHome *accountHome = [SHAccountTool account];
+    CYAccount *cyAccount = [CYAccountTool account];
+    
     if (indexPath.row == 0) {//我睡了
-        if ([accountHome.isSleep isEqualToString:@"YES"]) {
+        if ([cyAccount.isSleep isEqualToString:@"YES"]) {
             SHSleepViewController *sleepVC = [[SHSleepViewController alloc] init];
             sleepVC.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
             [self presentViewController:sleepVC animated:YES completion:nil];
@@ -132,24 +136,23 @@
             NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
             //设置日期格式(声明字符串里面每个数字和单词的含义)
             fmt.dateFormat = @"yyyy-MM-dd HH:mm:ss";
-            accountHome.sleepTimeDate = [fmt stringFromDate:[NSDate date]];
-            accountHome.isSleep = @"YES";
+            cyAccount.sleepTimeDate = [fmt stringFromDate:[NSDate date]];
+            cyAccount.isSleep = @"YES";
             //存入沙盒
-            CYAccount *cyAccount = [CYAccountTool account];
-            if (cyAccount.accountHomeObjID) {
             //上传到云端
-                AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"SHAccountHome" objectId:cyAccount.accountHomeObjID];
-                [accountAV setObject:accountHome.mj_keyValues forKey:@"accountHome"];
-                [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-                    if (succeeded) {
-                        //存储到本地
-                        CYLog(@"存储睡觉信息成功");
-                        //存储到沙盒
-                        [SHAccountTool saveAccount:accountHome];
-                    }
-                }];
-            }
-            [SHAccountTool saveAccount:accountHome];
+            AVObject *accountAV = [AVObject objectWithoutDataWithClassName:@"CYAccount" objectId:cyAccount.objectId];
+            [accountAV setObject:cyAccount.sleepTimeDate forKey:@"sleepTimeDate"];
+            [accountAV setObject:cyAccount.isSleep forKey:@"isSleep"];
+            [accountAV saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    //存储到本地
+                    CYLog(@"存储睡觉信息成功");
+                    //存储到沙盒
+                    [CYAccountTool saveAccount:cyAccount];
+                }
+            }];
+
+            [CYAccountTool saveAccount:cyAccount];
         }];
         [alertVC addAction:actionSleep];
             
@@ -235,6 +238,8 @@
                 } else {//米
                     distanceStr = [NSString stringWithFormat:@"%d米",(int)meters];
                 }
+                
+                [self meSendMessageToOtherWithDistanceStr:distanceStr];
                 //提示框
                 UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:@"发送距离成功" message:[NSString stringWithFormat:@"你们两人距离为:%@",distanceStr] preferredStyle:(UIAlertControllerStyleActionSheet)];
                 UIAlertAction *action = [UIAlertAction actionWithTitle:@"确定" style:(UIAlertActionStyleDefault) handler:^(UIAlertAction *action) {
@@ -257,7 +262,24 @@
 }
 
 
-
+- (void)meSendMessageToOtherWithDistanceStr:(NSString *)distanceStr {
+    // Tom 创建了一个 client，用自己的名字作为 clientId
+    CYAccount *cyAccount = [CYAccountTool account];
+    self.client = [[AVIMClient alloc] initWithClientId:cyAccount.userName];
+    
+    // Tom 打开 client
+    [self.client openWithCallback:^(BOOL succeeded, NSError *error) {
+        // Tom 建立了与 Jerry 的会话
+        [self.client createConversationWithName:nil clientIds:@[cyAccount.otherUserName] callback:^(AVIMConversation *conversation, NSError *error) {
+            // Tom 发了一条消息给 Jerry
+            [conversation sendMessage:[AVIMTextMessage messageWithText:distanceStr attributes:nil] callback:^(BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    NSLog(@"发送距离给对方成功！");
+                }
+            }];
+        }];
+    }];
+}
 
 
 

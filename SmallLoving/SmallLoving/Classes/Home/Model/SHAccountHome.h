@@ -9,10 +9,10 @@
 #import <Foundation/Foundation.h>
 
 @interface SHAccountHome : NSObject
-@property(nonatomic, strong)NSString *sleepTimeDate;//开始睡觉的时间
-@property(nonatomic, strong)NSString  *isSleep;//是否正在睡觉
+//@property(nonatomic, strong)NSString *sleepTimeDate;//开始睡觉的时间
+//@property(nonatomic, strong)NSString  *isSleep;//是否正在睡觉
 @property(nonatomic, strong)NSString *coverImageUrl;//封面图片
-//@property (nonatomic, strong)NSString *sex;//男女性别
+
 @property (nonatomic, strong)NSString *lastAuntDate;//上一次姨妈时间
 @property (nonatomic, strong)NSString *interval;//姨妈时间间隔
 @property (nonatomic, strong)NSString * isMenstruation;//是否正在姨妈期

@@ -50,5 +50,7 @@
 @property (nonatomic, assign)NSString *latitude;//纬度
 @property (nonatomic, assign)NSString *longitude;//经度
 
+@property(nonatomic, strong)NSString *sleepTimeDate;//开始睡觉的时间
+@property(nonatomic, strong)NSString  *isSleep;//是否正在睡觉
 
 @end
