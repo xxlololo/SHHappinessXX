@@ -89,10 +89,10 @@
         make.right.equalTo(self).offset(-30);
         make.height.mas_equalTo(50);
     }];
-    [self.findPasswordBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.loginBtn.mas_bottom).offset(10);
-        make.left.right.height.equalTo(self.loginBtn);
-    }];
+//    [self.findPasswordBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.equalTo(self.loginBtn.mas_bottom).offset(10);
+//        make.left.right.height.equalTo(self.loginBtn);
+//    }];
 }
 
 @end

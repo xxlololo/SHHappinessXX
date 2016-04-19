@@ -29,8 +29,8 @@
  *  程序准备就绪即将运行
  */
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [AVOSCloud setApplicationId:@"DHichWmxlTo8kqRxBn0Cb6n6-gzGzoHsz"
-                      clientKey:@"gNgUECeDt6sQPWD83QxYH5JO"];
+    [AVOSCloud setApplicationId:@"kpXxKrkTjlgyw3uTWPDKCLLC-gzGzoHsz"
+                      clientKey:@"MhUJHBVAPtplMw7rg18JCECh"];
     [CYAccount registerSubclass];
     self.window = [[UIWindow alloc]initWithFrame:[UIScreen mainScreen].bounds];
     self.window.backgroundColor = [UIColor whiteColor];

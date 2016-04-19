@@ -57,15 +57,15 @@
 - (void)referAction:(UIButton *)btn {
     [AVUser verifyMobilePhone:self.verificationView.authCodeTF.text withBlock:^(BOOL succeeded, NSError *error) {
         if (succeeded) {
-            // 存到本地
-            [CYAccountTool saveAccount:self.account];
             //存储到服务器
             CYAccount *cyAccount = [CYAccount object];
             cyAccount.userName = self.account.userName;
             cyAccount.password = self.account.password;
-            [cyAccount saveInBackground];
-
-            [self dismissViewControllerAnimated:YES completion:nil];
+            [cyAccount saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                // 存到本地
+                [CYAccountTool saveAccount:self.account];
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }];
         } else {
             UIAlertController * defAlertVC = [UIAlertController alertControllerWithTitle:@"失败" message:@"验证码错误, 请重试" preferredStyle:(UIAlertControllerStyleActionSheet)];
             UIAlertAction * cancelAction = [UIAlertAction actionWithTitle:@"取消" style:(UIAlertActionStyleCancel) handler:nil];
